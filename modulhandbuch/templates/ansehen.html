@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+
+{% block title  %}
+    Modulhandbuch
+{% endblock %}
+{% block breadcrumb %}
+    <li><a href="/">Home</a></li>
+    <li><a href="{% url 'mhbhome' %}">Modulhandbuch</a></li>
+    <li class="active">Ansehen</li>
+{% endblock %}
+
+{% block content %}
+
+
+    <div class="panel panel-success">
+        <div class="panel-heading" >
+            <div class="panel-title">
+                Daten ansehen
+            </div>        
+        </div>
+        <div class="panel-body">
+            <div class="list-group">
+                <a href="{% url 'fachgebieteList' %}"  class="list-group-item"> Fachgebiete </a>  
+                <a href="{% url 'lehreinheitenList' %}"  class="list-group-item"> Lehreinheiten</a>   
+                <a href="{% url 'lehrendeList' %}"  class="list-group-item"> Lehrende </a>  
+                <a href="{% url 'lehrveranstaltungenList' %}"  class="list-group-item"> Lehrveranstaltungen </a> 
+                <a href="{% url 'moduleList' %}"  class="list-group-item"> Module </a> 
+                <a href="{% url 'organisationsList' %}"  class="list-group-item"> Organsiationsformen der Module  </a> 
+                <a href="{% url 'pruefungsformList' %}"  class="list-group-item"> Prüfungsformen </a> 
+                <a href="{% url 'studiengangList' %}"  class="list-group-item">  Studiengänge </a> 
+                <a href="{% url 'focusareaList' %}"  class="list-group-item"> Studienrichtungen (Focus Areas) innerhalb eines Studiengangs </a> 
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

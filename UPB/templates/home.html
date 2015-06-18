@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title  %}
+Webanwendungen der UPB  
+{% endblock %}
+{% block breadcrumb %}
+    <li class="active">Home</li>
+{% endblock %}
+
+{% block content %}
+
+<div class="panel panel-default">
+  <div class="panel-heading">Webanwendungen der UPB</div>
+  <div class="panel-body">
+      Willkommen zu den Webanwendungen der Universität
+      Paderborn. Derzeit stehen Ihnen die folgenden Anwendungen zur
+      Verfügung. 
+  </div>
+</div>
+    
+<div class="list-group">
+    <a href="{% url 'mhbhome' %}"  class="list-group-item"> Modulhandbuch </a>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title  %}
+Modulhandbücher der UPB  
+{% endblock %}
+{% block breadcrumb %}
+    <li> <a href="{% url 'home' %}"> Home </a> </li>
+    <li class="active">Modulhandbuch</li>
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">Modulhandbuch</div>
+  <div class="panel-body">
+      Diese Webanwendung dient der Verwaltung von Modulhandbüchern
+      über verschiedene Studiengänge hinweg. Lehrveranstaltungen,
+      Module, etc. müssen nur einmal gepflegt werden. Aus den hier angelegten Daten können Modulhandbücher in verschiednen Formaten generiert werden, z.B. PDF, HTML, u.a. 
+  </div>
+</div>
+    
+
+
+Sie haben folgende Möglichkeiten:
+<p>
+    
+<div class="list-group">
+    <a href="/modulhandbuch/ansehen"  class="list-group-item"> Alle Daten ansehen </a> 
+    <a href="/admin"  class="list-group-item"> Daten ändern </a> 
+    <a href="#"  class="list-group-item"> Handbücher generieren </a>
+</div>
+
+
+    <!-- <li> <a href="modulhandbuch/ansehen"> Alle Daten ansehen </a> </li> -->
+    <!-- <li> <a href="admin/"> Daten ändern </a> </li> -->
+    <!-- <li> Handbücher generieren </li> -->
+
+
+{% endblock %}

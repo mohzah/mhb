@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Modulhandbuch, Daten ansehen 
+{% endblock %}
+
+{% block breadcrumb %}
+    <li><a href="/">Home</a></li>
+    <li><a href="/modulhandbuch/">Modulhandbuch</a></li>
+    <li><a href="/modulhandbuch/ansehen">Ansehen </a></li>
+    <li class="active">{{ title }}</li>
+{% endblock %}
+
+
+{% block content %}
+    
+
+    <h2>     {{ title }} </h2>
+
+    <p> 
+        <a href="/admin/modulhandbuch/{{ modelname|lower }}/add" class="btn btn-primary"> Hinzufügen </a>
+    </p>
+    <hr>
+    <p/>
+            
+    {% for obj, permission  in object_list %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-md-6">
+                    {{ obj }}
+                </div>
+                <div class="col-md-3">
+                    <a class="btn btn-default" href="/modulhandbuch/{{ modelname|lower }}/{{ obj.id }}">
+                        SHOW
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    {% if permission %}
+                        <a  class="btn btn-danger" href="/admin/modulhandbuch/{{ modelname|lower }}/{{ obj.id }}">
+                            EDIT
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
