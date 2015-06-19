@@ -1,0 +1,18 @@
+# things to do for root:
+
+  
+- name: Basic software installation
+  hosts: webapp
+  remote_user: root
+  tasks:
+    - name: Basic software via apt
+      apt: name={{ item }} state=installed
+      with_items:
+        - build-essential
+        - git 
+        - python-dev
+        - python-pip
+        - texlive # heisst das so? 
+  tags: software
+
+  
