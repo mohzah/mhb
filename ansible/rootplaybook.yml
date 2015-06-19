@@ -12,7 +12,12 @@
         - git 
         - python-dev
         - python-pip
+        - python-virtualenv
         - texlive # heisst das so? 
   tags: software
 
-  
+# only python module we install as root: 
+- name: Install virtualenv
+  hosts: webapp
+  remote_user: root  
+  pip: name=virtualenv

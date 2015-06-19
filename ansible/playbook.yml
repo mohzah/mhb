@@ -5,8 +5,12 @@
 - name: Python software installation
   hosts: webapp
   tasks:
+    # just to be on the safe side, create the directory 
+    - name: Create virtualenv directory
+      file: path={{ ansible_env.HOME }}/.venv/webapp state=directory mode=0755
+    # actual module installs: 
     - name: Basic django modules 
-      pip: name={{ item }}
+      pip: name={{ item }} virtualenv={{ ansible_env.HOME }}/.venv/webapp
       with_items:
         - django
         - uwsgi
