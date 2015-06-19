@@ -1,0 +1,72 @@
+---
+
+# An Ansible script to install Modulhandbuch
+
+- name: Basic software installation
+  hosts: webapp
+  remote_user: root
+  tasks:
+    - name: Basic software via apt
+      apt: name={{ item }} state=installed
+      with_items:
+        - build-essential
+        - git 
+        - python-dev
+        - python-pip
+        - texlive # heisst das so? 
+  tags: software
+        
+- name: Python software installation
+  hosts: webapp
+  tasks:
+    - name: Basic django modules 
+      pip: name={{ item }}
+      with_items:
+        - django
+        - uwsgi
+        - jinja2
+        - Werkzeug
+        - django_extensions
+        - django_tables2
+        - django-crispy_forms
+        - django-admin-bootstrapped
+        - django-bootstrap3
+        - django-bootstrap-themes
+        - django-easy-select2
+        - django-autoslug
+        - django-auth-krb
+    tags: django 
+
+- name: GetWebApp
+  hosts: webapp
+  tasks:
+    - name: Get the repostiory
+      git: repo=irb-git@git.cs.upb.de:holger.karl/modulhandbuch.git dest={{ ansible_env.HOME }}/UPB
+      # access credentials?
+    - name: Patch settings file
+      replace: dest={{ ansible_env.HOME }}/UPB/settings.py regexp='RUN_ON_WEBAPP = False' replace='RUN_ON_WEBAPP = False'
+    - name: Create logs directory
+      file: path={{ ansible_env.HOME }}/logs state=directory
+    - name: Migrate the database
+      shell: cd {{ ansible_env.HOME }}/UPB ; python manage.py migrate > logs/migrate.out 2> logs/migrate.err
+    # not sure such a backup job is required? if so, where is Isilon mounted? or other means for a simple backup? not much data, anyways 
+    # - name: Cronjobs for backups
+    #   cron: name="backup webapps" hour="3" minute="10" user={{ user }} state=present job="cp the sqlite database to isilon >> {{ ansible_env.HOME }}/logs/backup.log  2>&1"
+
+
+    
+# depending on the way the application runs (apache? stand-alone? nginx?)
+# we need additional actions to integrate the  application server into the web server
+# or to simply start up the test server. Have to check!
+# the following would need a service description on top 
+# - name: StartWebApp
+#   remmote_user: root
+#   hosts: webapp
+#   tasks:
+#     - name: ensure that the webapp is running
+#       service: name=UPB state=restarted enabled=yes
+#     # this is a workaround: state=restarted does not seem to work reliably :-( 
+#     - name: really restart SVPB 
+#       shell: /usr/sbin/service UPB restart
+#   tags: service 
+

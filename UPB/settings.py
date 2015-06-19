@@ -124,3 +124,6 @@ STATIC_URL = '/static/'
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap'
+
+# own settings:
+RUN_ON_WEBAPP = False
