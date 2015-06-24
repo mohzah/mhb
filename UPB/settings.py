@@ -73,7 +73,7 @@ ROOT_URLCONF = 'UPB.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['UPB/templates', ],
+        'DIRS': ['UPB/templates', 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
