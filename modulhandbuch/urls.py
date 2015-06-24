@@ -34,16 +34,23 @@ def active_and_login_required(function=None,
     return actual_decorator
 
 
+
 urlpatterns = [
-    # TODO: figure out how to limit admin to certain applications 
+    # TODO: figure out how to limit admin to certain applications
+    # TODO: Namen auf modulnamen vereinhetlichen; das hilft bei den breadcrumbs!
     url(r'/mhbhome.html',
         active_and_login_required(
             TemplateView.as_view(template_name="mhome.html")),
         name="mhbhome"),
-
-    url(r'/ansehen',
+    url(r'/$',
         active_and_login_required(
-            TemplateView.as_view(template_name="ansehen.html"))),
+            TemplateView.as_view(template_name="mhome.html")),
+        name="modulhandbuch"),
+
+    url(r'/ansehen$',
+        active_and_login_required(
+            TemplateView.as_view(template_name="ansehen.html")),
+        name="modulhandbuchansehen"),
 
     ##### 
     # URLs for the various objects: 
@@ -64,6 +71,9 @@ urlpatterns = [
     url(r'/lehrender$',
         active_and_login_required(views.LehrendeView.as_view()),
         name="lehrendeList"),
+    url(r'/lehrender$',
+        active_and_login_required(views.LehrendeView.as_view()),
+        name="lehrender"),
     url(r'/lehrender/(?P<pk>[0-9]+)$',
         active_and_login_required(views.LehrendeDetailView.as_view()),
         name="lehrendeDetail"),
