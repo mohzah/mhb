@@ -11,6 +11,7 @@
                         {{ app_label|title }}
                     </a>
                 </li>
+                {% comment %}
                 <!-- Das hier gibt die Liste alle Modelle über die Admin-Schnittstelle -->
                 <!-- <li> -->
                 <!--     {% url ansehname as ansehurl %} -->
@@ -18,14 +19,16 @@
                 <!--         Ändern -->
                 <!--     </a> -->
                 <!-- </li> -->
+                {% endcomment %}
                 <li>
                     {% with ansehname=opts.app_label|add:"ansehen" %}
                         {% url ansehname as ansehurl %}
                         <a href="{{ ansehurl }}">  Ansehen   </a> 
                     {% endwith %}
                 </li>
-               <!--  Das hier gibt die Liste aller Elemente eines Moduls im Admin -->
-               <!-- -Interface -->
+                {% comment %}
+                <!--  Das hier gibt die Liste aller Elemente eines Moduls im Admin -->
+                <!-- -Interface -->
                 <!-- <li> -->
                 <!--     {% if has_change_permission %} -->
                 <!--         <a href="{% url opts|admin_urlname:'changelist' %}"> -->
@@ -36,10 +39,12 @@
                 <!-- </li> -->
                 <!-- Alternativ: die Liste aller Elemente eines Models -->
                 <!-- in der eigenen Anseh-Liste -->
+                {% endcomment %}
                 <li>
                     {% with modelname=opts.verbose_name_plural %}
-                        {% with modelURLname=opts.verbose_name_plural|lower|add:'List' %}
-                            <a href="{% url modelURLname %}">  {{ modelname }} </a>                           {% endwith %}
+                        {% with modelURLname=opts.model_name|lower|add:'List' %}
+                            <a href="{% url modelURLname %}">  {{ modelname }} :                      {{ opts.model_name }}
+ </a>                           {% endwith %}
                     {% endwith %}
                 </li>
                 <li>

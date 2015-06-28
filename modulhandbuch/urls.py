@@ -53,53 +53,58 @@ urlpatterns = [
         name="modulhandbuchansehen"),
 
     ##### 
-    # URLs for the various objects: 
+    # URLs for the various objects:
+    # naming convention: the names of the URL patterns MUST
+    # be the lower-case model names, with List or Detail appended.
+    # else, autmatically going back to the right URLs in change_form
+    # does not work
+    
     url(r'/fachgebiet$',
         active_and_login_required(views.FachgebieteView.as_view()),
-        name="fachgebieteList"), 
+        name="fachgebietList"), 
     url(r'/fachgebiet/(?P<pk>[0-9]+)',
         active_and_login_required(views.FachgebieteDetailView.as_view()),
-        name="fachgebieteDetail"),
+        name="fachgebietDetail"),
     
     url(r'/lehreinheit$',
         active_and_login_required(views.LehreinheitenView.as_view()),
-        name="lehreinheitenList"),
+        name="lehreinheitList"),
     url(r'/lehreinheit/(?P<pk>[0-9]+)$',
         active_and_login_required(views.LehreinheitenDetailView.as_view()),
-        name="lehreinheitenDetail"),
+        name="lehreinheitDetail"),
     
     url(r'/lehrender$',
         active_and_login_required(views.LehrendeView.as_view()),
-        name="lehrendeList"),
+        name="lehrenderList"),
     url(r'/lehrender$',
         active_and_login_required(views.LehrendeView.as_view()),
         name="lehrender"),
     url(r'/lehrender/(?P<pk>[0-9]+)$',
         active_and_login_required(views.LehrendeDetailView.as_view()),
-        name="lehrendeDetail"),
+        name="lehrenderDetail"),
 
     
     url(r'/lehrveranstaltung$',
         active_and_login_required(views.LehrveranstaltungenView.as_view()),
-        name="lehrveranstaltungenList"),
+        name="lehrveranstaltungList"),
     url(r'/lehrveranstaltung/(?P<pk>[0-9]+)$',
         active_and_login_required(views.LehrveranstaltungenDetailView.as_view()),
-        name="lehrveranstaltungenDetail"),
+        name="lehrveranstaltungDetail"),
 
     
     url(r'/modul$',
         active_and_login_required(views.ModuleView.as_view()),
-        name="moduleList"), 
+        name="modulList"), 
     url(r'/modul/(?P<pk>[0-9]+)$',
         active_and_login_required(views.ModuleDetailView.as_view()),
-        name="moduleDetail"),
+        name="modulDetail"),
     
     url(r'/organisationsform$',
         active_and_login_required(views.OrganisationsformView.as_view()),
-        name="organisationsList"),
+        name="organisationsformList"),
     url(r'/organisationsform/(?P<pk>[0-9]+)$',
         active_and_login_required(views.OrganisationsformDetailView.as_view()),
-        name="organisationsDetail"),
+        name="organisationsformDetail"),
     
     url(r'/pruefungsform$',
         active_and_login_required(views.PruefungsformView.as_view()),
