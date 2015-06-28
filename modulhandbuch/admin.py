@@ -20,7 +20,7 @@ class OwnedAdmin(admin.ModelAdmin):
         tmp = [f.name for f in self.model._meta.fields]
         try: 
             tmp.remove('id')
-            # tmp.remove('owner')
+            tmp.remove('owner')
             tmp.remove('namedentity_ptr')
             tmp.remove('slug')
         except:
@@ -143,7 +143,6 @@ class ModulLVInline(OwnedInline):
     #         return True
     #     pass
 
-    # def has_add_permission(self, request):
 
         
 ###############################
@@ -194,16 +193,36 @@ class StudiengangAdmin(admin.ModelAdmin):
                StudiengangModuleInline]
     pass
 
+
 class LehrenderAdmin(OwnedAdmin):
     model = Lehrender
 
 
-admin.site.register(Lehreinheit)
-admin.site.register(Fachgebiet)
+class FachgebietAdmin(OwnedAdmin):
+    model = Fachgebiet
+
+
+class LehreinheitAdmin(OwnedAdmin):
+    model = Lehreinheit
+
+
+class PruefungsformAdmin(OwnedAdmin):
+    model = Pruefungsform
+
+
+class OrganisationsformAdmin(OwnedAdmin):
+    model = Organisationsform
+
+
+class LehrveranstaltungAdmin(OwnedAdmin):
+    model = Lehrveranstaltung
+
+admin.site.register(Lehreinheit, LehreinheitAdmin)
+admin.site.register(Fachgebiet, FachgebietAdmin)
 admin.site.register(Lehrender, LehrenderAdmin)
-admin.site.register(Pruefungsform)
-admin.site.register(Organisationsform)
-admin.site.register(Lehrveranstaltung)
+admin.site.register(Pruefungsform, PruefungsformAdmin)
+admin.site.register(Organisationsform, OrganisationsformAdmin)
+admin.site.register(Lehrveranstaltung, LehrveranstaltungAdmin)
 admin.site.register(Modul, ModulAdmin)
 admin.site.register(FocusArea, FocusAreaAdmin)
 admin.site.register(Studiengang, StudiengangAdmin)
