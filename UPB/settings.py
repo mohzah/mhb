@@ -128,6 +128,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap'
 # own settings:
 RUN_ON_WEBAPP = False
 
+# redirect url after login
+LOGIN_REDIRECT_URL = '/'
 
 # to put the genreated PDF files in the right place:
 # TODO: check whether getting DB_HOST is a viable, practical way to differentiate
