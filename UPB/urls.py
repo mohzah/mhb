@@ -20,6 +20,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.views.generic import TemplateView
 
+import UPB.views
+
 admin.site.site_header = 'UPB Webanwendungen'
 
 def active_and_login_required(function=None,
@@ -47,7 +49,7 @@ urlpatterns = [
         name="home"),
     url(r'^modulhandbuch', include('modulhandbuch.urls')),
 
-    # url(r'^media/(?P<filename>.*)/$',
-    #     UPB.views.serveGeneratedFiles.as_view(),
-    #     name="media")
+    url(r'^media/(?P<filename>.*)/$',
+        UPB.views.serveGeneratedFiles.as_view(),
+        name="media")
 ]
