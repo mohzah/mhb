@@ -38,10 +38,16 @@ def active_and_login_required(function=None,
 urlpatterns = [
     # TODO: figure out how to limit admin to certain applications 
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^accounts/login/$', 'django_auth_krb.views.krb_login'),
+    url(r'^accounts/logout/$', 'django_auth_krb.views.krb_logout'),
     url(r'^accounts/login/$', auth_views.login),
     url(r'^$',
         active_and_login_required(
             TemplateView.as_view (template_name='home.html')),
         name="home"),
     url(r'^modulhandbuch', include('modulhandbuch.urls')),
+
+    # url(r'^media/(?P<filename>.*)/$',
+    #     UPB.views.serveGeneratedFiles.as_view(),
+    #     name="media")
 ]
