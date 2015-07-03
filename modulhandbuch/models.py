@@ -268,7 +268,7 @@ class Modul(ExaminedEntity):
     pflicht = models.BooleanField(default=False)
 
     anzahlLvs = models.IntegerField(default=0,
-                                    help_text="Wie viele Lehrveranstaltungen in diesem Modul? Zur Berechung des Arbeitsaufwandes notwendig.")
+                                    help_text="Wie viele Lehrveranstaltungen müssen in diesem Modul belegt werden in diesem Modul? Zur Berechung des Arbeitsaufwandes notwendig.")
 
     # TODO: If it stays a responsible entity, then we need methods
     # to ask for the SWS both here and in SWSEntity, for uniform access
