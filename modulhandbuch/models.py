@@ -230,6 +230,33 @@ class Lehrveranstaltung(SWSEntity):
     materialDe = models.TextField(blank=True)
     materialEn = models.TextField(blank=True)
 
+    def in_modul(self, modul):
+        """A little helper function: check if this
+        LV is in the modul given an parameter.
+        If yes, return the LPs, if no, return None
+        """
+
+        # print "-------"
+        # print self, modul
+        try:
+            vlps = VeranstaltungsLps.objects.filter(
+                modul=modul).filter(
+                    veranstaltung=self)
+            # print "vlps: ", vlps
+
+            if vlps:
+                lp = vlps[0].lp
+            else:
+                lp = None
+        except Exception as e:
+            # print "error: ", e, self, modul
+            lp = None
+
+        # print "Lp: ", lp
+        # print "====="
+
+        return lp
+
     class Meta:
         verbose_name_plural = "Lehrveranstaltungen"
         verbose_name = "Lehrveranstaltung"
