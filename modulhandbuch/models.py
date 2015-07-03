@@ -5,6 +5,8 @@ from django.db import models
 from autoslug import AutoSlugField
 from django.contrib.auth.models import User
 
+import re
+
 ############
 # abstract base classes
 
@@ -314,7 +316,9 @@ class FocusArea(ResponsibleEntity):
 class Studiengang(ResponsibleEntity):
     module = models.ManyToManyField(Modul)
     focusareas = models.ManyToManyField(FocusArea)
-    startdateien = models.ManyToManyField("TexDateien")
+    startdateien = models.ManyToManyField("TexDateien",
+                                          verbose_name="Benutzte Dateien",
+                                          help_text="Welche Tex-Dateien werden für dieesen Studiengang benötigt?")
     
     class Meta:
         verbose_name = "Studiengang"
@@ -322,6 +326,7 @@ class Studiengang(ResponsibleEntity):
 
 
 class TexDateien (models.Model):
+    # add description, make filename unique! 
     filename = models.CharField(max_length=100)
     description = models.CharField(max_length=200, blank=True)
     tex = models.TextField()
@@ -330,6 +335,14 @@ class TexDateien (models.Model):
         verbose_name = "Tex-Datei/allgemeines Template"
         verbose_name_plural = "Tex-Dateien/allgemeine Templates"
 
+    def is_start_file(self):
+        """check whether the tex code contains 
+        documentclass command. We assume that this means
+        it should be translated by pdflatex.
+        """
+
+        return "documentclass" in self.tex
+        
     def __unicode__(self):
         return self.filename
 
