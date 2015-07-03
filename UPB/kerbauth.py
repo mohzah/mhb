@@ -13,7 +13,7 @@ class KerbAuth(ModelBackend):
         UserModel = get_user_model()
         if username is None:
             username = kwargs.get(UserModel.USERNAME_FIELD)
-            
+
         # print "trying to authenticate ", username, password
 
         try:
@@ -23,14 +23,19 @@ class KerbAuth(ModelBackend):
             # print "Kerberos auth failed"
             return None
 
-        # print "kerberos succeeded" 
+        # print "kerberos succeeded"
 
         user, created = User.objects.get_or_create(
             username=username
         )
 
         # print "user, created: ", user, type(user), created
-        
+        if settings.RUN_ON_WEBAPP:
+            import getent
+            webappgroup = dict(getent.group('webapp'))
+            if user not in webappgroup['members']:
+                return None
+
         if created:
             # no local password for such users
             user.set_unusable_password()
@@ -45,14 +50,14 @@ class KerbAuth(ModelBackend):
             except:
                 # print "adding user to group did not work"
                 pass
-            
+
             user.save()
 
         return user
 
     # def get_user(self, user_id):
     #     print "getting user: ", user_id
-        
+
     #     UserModel = get_user_model()
     #     try:
     #         user = UserModel._default_manager.get(pk=user_id)
@@ -61,4 +66,3 @@ class KerbAuth(ModelBackend):
     #         return None
 
     #     return user
-
