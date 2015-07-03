@@ -316,6 +316,22 @@ class Generieren(TemplateView):
 
         error = []
 
+        # pass in all the generic data, not related to
+        # the concrete studiengang
+        _lehreinheiten = models.Lehreinheit.objects.all()
+        _fachgebiete = models.Fachgebiet.objects.all()
+        _pruefungsformen = models.Pruefungsform.objects.all()
+        _organisationsformen = models.Organisationsform.objects.all()
+        _lehrende = models.Lehrender.objects.all()
+        _studiengaenge = models.Studiengang.objects.all()
+
+        # FIX: only the actual ones 
+        
+        _module = models.Modul.objects.all()
+        _focusareas = models.FocusArea.objects.all()
+
+        _lehrveranstaltungen = models.Lehrveranstaltung.objects.all()
+
         try:
             f = codecs.open(
                 os.path.join(
@@ -327,18 +343,31 @@ class Generieren(TemplateView):
 
             # stuff in all the relevant models so that the template
             # can iterate over it:
-            r = ltemplate.render(lehreinheiten=models.Lehreinheit.objects.all(),
-                                 fachgebiete=models.Fachgebiet.objects.all(),
-                                 pruefungsformen=models.Pruefungsform.objects.all(),
-                                 organisationsformen=models.Organisationsform.objects.all(),
-                                 lehrende=models.Lehrender.objects.all(),
-                                 lehrveranstaltungen=models.Lehrveranstaltung.objects.all(),
-                                 module=models.Modul.objects.all(),
-                                 focusareas=models.FocusArea.objects.all(),
-                                 studiengaenge=models.Studiengang.objects.all(),
+
+            # lehrveranstaltungen = [l for l in
+            #                        models.lehrveranstaltungen.objects.all()]
+
+            r = ltemplate.render(
+                lehreinheiten=_lehreinheiten,
+                fachgebiete=_fachgebiete,
+                pruefungsformen=_pruefungsformen,
+                organisationsformen=_organisationsformen,
+                lehrende=_lehrende,
+                # restrict LVs, Module, FAs, to the particular Studiengang!
+                # the "all" version are only to ease testing
+                module=_module,
+                # module=studiengang.module.all(),
+                focusareas=_focusareas,
+                # focusareas=studiengang.focusareas.all(),
+                # only pass in those lehrveranstaltungen
+                # that appear in the studiengang
+                lehrveranstaltungen=_lehrveranstaltungen,
+                # lehrveranstaltungen=lehrveranstaltungen,
+                studiengaenge=_studiengaenge,
                                  studiengang=studiengang,
                                  startdatei=startdatei,
             )
+
 
             f.write(r)
             f.close()
