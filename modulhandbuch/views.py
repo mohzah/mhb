@@ -307,7 +307,9 @@ class Generieren(TemplateView):
 
         return retval
 
-    def renderTexdateiObj(self, tmpdir, texdateiObj, latex_renderer):
+    def renderTexdateiObj(self, tmpdir, texdateiObj,
+                          studiengang, startdatei,
+                          latex_renderer):
         """Take a single texdatei object and turn it
         into a tex file in the file system
         """
@@ -334,6 +336,8 @@ class Generieren(TemplateView):
                                  module=models.Modul.objects.all(),
                                  focusareas=models.FocusArea.objects.all(),
                                  studiengaenge=models.Studiengang.objects.all(),
+                                 studiengang=studiengang,
+                                 startdatei=startdatei,
             )
 
             f.write(r)
@@ -363,30 +367,40 @@ class Generieren(TemplateView):
          Return a path name/  link (?) to the produced file.
         """
 
-        path = ""
+        # we store all the produced paths in here: 
+        path = {}
+
+        # a list of error messages, to render in the template:
         error = []
 
         # run pdflatex on the produced tex file
-        retval = self.runLatex(texdateiObj.filename, tmpdir)
+        if texdateiObj.is_start_file():
+            retval = self.runLatex(texdateiObj.filename, tmpdir)
+        else:
+            retval = {}
+            retval['returncode'] = -1
+            retval['cmd'] = "Keine Ausführung von pdflatex, da kein documentclass"
+            retval['output'] = ""
+        
         if retval['returncode'] is not 0:
             error = ("Command {} failed with returncode: {} and output {}"
                      .format(retval['cmd'],retval['returncode'],retval['output'],
                          ))
-            return ('', error)
+            path['pdf'] = ""
+        else:
+            # copy the produced PDF file to the destination
+            shutil.copyfile(os.path.join(tmpdir, retval['pdf']),
+                            os.path.join(destDir, retval['pdf']))
+            path['pdf'] = settings.MEDIA_URL + "modulhandbuch/" + retval['pdf']
 
-
-        # copy the produced PDF file to the destination
-        shutil.copyfile(os.path.join(tmpdir, retval['pdf']),
-                        os.path.join(destDir, retval['pdf']))
-
-        # as well as an arhive
-
+        # as well as an archive
         tmp = os.path.splitext(os.path.basename(texdateiObj.filename))[0]
         archivename = os.path.join(
             destDir,
             tmp,
         )
 
+        print "destDir: ", destDir
         print "archieve name: ", archivename
         
         archive = shutil.make_archive(
@@ -395,14 +409,10 @@ class Generieren(TemplateView):
             root_dir=tmpdir,
         )
 
-
-        # return tuple:
-        path = {}
-        path['pdf'] = settings.MEDIA_URL + "modulhandbuch/" + retval['pdf']
-        path['tgz'] = (settings.MEDIA_URL + "modulhandbuch/" +
-                       re.sub ('.pdf$', '', retval['pdf']) + '.zip')
-
-        return (path, '')
+        # TODO: make the URL to the archiv more meaningful
+        path['tgz'] = (settings.MEDIA_URL + "modulhandbuch/archiv.zip")
+                       
+        return (path, error)
 
     def get_context_data(self, **kwargs):
 
@@ -464,7 +474,9 @@ class Generieren(TemplateView):
         )
 
         for td in sgObj.startdateien.all():
-            error = self.renderTexdateiObj(tmpdir, td, latex_renderer)
+            error = self.renderTexdateiObj(tmpdir, td,
+                                           sgObj, tdObj, 
+                                           latex_renderer)
             if error:
                 globalerror += error
 
@@ -473,6 +485,7 @@ class Generieren(TemplateView):
             return context
 
         # run pdflatex on the chosen startfile and copy into media directory
+        # limiting to files with documnetclass in them: mostly a debugging aid
         path, globalerror = self.generatePdf(tmpdir, destDir, tdObj)
 
 
