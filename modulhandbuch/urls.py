@@ -52,6 +52,15 @@ urlpatterns = [
             TemplateView.as_view(template_name="ansehen.html")),
         name="modulhandbuchansehen"),
 
+    url(r'/generieren$',
+        active_and_login_required(
+            active_and_login_required(views.GenerierenAuswahl.as_view())),
+            name="modulhandbuchgenerieren"),
+    
+    url(r'/generieren/(?P<sg>[0-9]+)/(?P<td>[0-9]+)$',
+        active_and_login_required(views.Generieren.as_view()),
+        name="modulhandbuchgenerierenPDF"),
+
     ##### 
     # URLs for the various objects:
     # naming convention: the names of the URL patterns MUST
@@ -125,7 +134,7 @@ urlpatterns = [
         name="focusareaList"), 
     url(r'/focusarea/(?P<pk>[0-9]+)$',
         active_and_login_required(views.FocusAreaDetailView.as_view()),
-        name="focusareaDetail"), 
+        name="focusareaDetail"),
 
     url(r'/texdatei$',
         active_and_login_required(views.TexDateienView.as_view()),

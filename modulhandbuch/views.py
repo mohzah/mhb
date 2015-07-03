@@ -1,9 +1,18 @@
+# -*- coding: utf-8 -*-
+
 from django.shortcuts import render
+from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
 
-from django.views.generic import View, ListView, DetailView
+from django.views.generic import View, TemplateView, ListView, DetailView
 
 import models
+
+import tempfile
+
+import jinja2
+
+import codecs, os, subprocess, shutil, re
 
 # Create your views here.
 
@@ -85,6 +94,9 @@ class FocusAreaView(SimpleListView):
     model = models.FocusArea
 
 
+class TexDateienView(SimpleListView):
+    model = models.TexDateien
+
 #########################################
 # Views for the detailed disaply of an entry
 
@@ -114,14 +126,14 @@ class SimpleDetailView(DetailView):
         context['modelname'] = (self.modelname
                                 if self.modelname
                                 else self.model.__name__)
-            
+
         # figure out which fields, precedence:
         # - given by the view subclass
         # - by the models meta class
         # - all fields
-        
+
         if not self.display_fields:
-            try: 
+            try:
                 self.display_fields = self.model.display_fields
             except:
                 # this is basically a fail, since nothing will be displayed :-(
@@ -131,16 +143,16 @@ class SimpleDetailView(DetailView):
 
         context['fields'] = []
         for  f in self.display_fields:
-            try: 
+            try:
                 vn = self.model._meta.get_field(f).verbose_name
             except FieldDoesNotExist:
                 continue
-            
+
             helptext = self.model._meta.get_field(f).help_text
 
             # getting the value is a bit more complex:
             at = getattr(self.object, f)
-            
+
             try:
                 val = at.__unicode__()
             except:
@@ -181,7 +193,7 @@ class PruefungsformDetailView(SimpleDetailView):
 
 class ModuleDetailView(SimpleDetailView):
     model = models.Modul
-    
+
     def get_context_data(self, **kwargs):
         context = super(ModuleDetailView, self).get_context_data(**kwargs)
 
@@ -189,7 +201,7 @@ class ModuleDetailView(SimpleDetailView):
         # work around; _set seems to have issues with inheritance :-(
         veranstaltungslps = models.VeranstaltungsLps.objects.filter(
             modul=self.object)
-        
+
         for lvlps in veranstaltungslps:
             context['fields'].append(
                 ( "VL " + lvlps.veranstaltung.__unicode__(),
@@ -214,13 +226,13 @@ class FocusAreaDetailView(SimpleDetailView):
                  ''
                 )
             )
-        
+
         return context
 
 
 class StudiengangDetailView(SimpleDetailView):
     model = models.Studiengang
-    # TODO: list foriegn keys 
+    # TODO: list foriegn keys
 
     def get_context_data(self, **kwargs):
         context = super(StudiengangDetailView, self).get_context_data(**kwargs)
@@ -232,7 +244,7 @@ class StudiengangDetailView(SimpleDetailView):
                  ''
                 )
             )
-        
+
         for m in self.object.focusareas.all():
             context['fields'].append(
                 ('Studienrichtung',
@@ -240,6 +252,240 @@ class StudiengangDetailView(SimpleDetailView):
                  ''
                 )
             )
-            
+
         return context
-    
+
+
+
+class GenerierenAuswahl(TemplateView):
+    template_name = "generieren.html"
+
+    def get_context_data(self, **kwargs):
+        print "in contetx data von GenerierenAuswahl"
+        context = super(GenerierenAuswahl, self).get_context_data(**kwargs)
+
+        context['files'] = [
+            (sg, [tex
+                  for tex in sg.startdateien.all()
+                  if tex.is_start_file()], )
+            for sg in models.Studiengang.objects.all()]
+        print context['files']
+
+        return context
+
+
+class Generieren(TemplateView):
+    template_name = "generatedPDFs.html"
+
+    def runLatex(self, fn, tempDir):
+        """
+        Run pdflatex twice on filename; return suitable error codes
+        """
+
+        retval = {}
+        try:
+            # run PDF twice:
+            retval['output'] = subprocess.check_output (['pdflatex',
+                                                         '-interaction=nonstopmode',
+                                                         fn],
+                                                        stderr=subprocess.STDOUT,
+                                                        cwd = tempDir
+                                                        )
+
+            retval['output'] = subprocess.check_output (['pdflatex',
+                                                         '-interaction=nonstopmode',
+                                                         fn],
+                                                        stderr=subprocess.STDOUT,
+                                                        cwd = tempDir
+                                                        )
+            retval['returncode'] = 0
+            retval['pdf'] = re.sub ('.tex$', '', fn) + '.pdf'
+        except subprocess.CalledProcessError as e:
+            retval['output'] = e.output
+            retval['cmd'] = e.cmd
+            retval['returncode'] = e.returncode
+
+        return retval
+
+    def renderTexdateiObj(self, tmpdir, texdateiObj, latex_renderer):
+        """Take a single texdatei object and turn it
+        into a tex file in the file system
+        """
+
+        error = []
+
+        try:
+            f = codecs.open(
+                os.path.join(
+                    tmpdir,
+                    texdateiObj.filename),
+                'w', 'utf-8')
+
+            ltemplate = latex_renderer.from_string(texdateiObj.tex)
+
+            # stuff in all the relevant models so that the template
+            # can iterate over it:
+            r = ltemplate.render(lehreinheiten=models.Lehreinheit.objects.all(),
+                                 fachgebiete=models.Fachgebiet.objects.all(),
+                                 pruefungsformen=models.Pruefungsform.objects.all(),
+                                 organisationsformen=models.Organisationsform.objects.all(),
+                                 lehrende=models.Lehrender.objects.all(),
+                                 lehrveranstaltungen=models.Lehrveranstaltung.objects.all(),
+                                 module=models.Modul.objects.all(),
+                                 focusareas=models.FocusArea.objects.all(),
+                                 studiengaenge=models.Studiengang.objects.all(),
+            )
+
+            f.write(r)
+            f.close()
+
+        except jinja2.TemplateSyntaxError as e:
+            # print e.message
+            # print e.lineno
+            error.append(texdateiObj.filename +
+                         ': Template Syntax Error, ' +
+                         e.message + " at line " + str(e.lineno))
+        except jinja2.TemplateAssertionError as e:
+            error.append(texdateiObj.filename +
+                         ': Template Assertion Error, ' +
+                         e.message + " at line " + str(e.lineno))
+        except Exception as e:
+            error.append(texdateiObj.filename +
+                         ': something went wrong; generic exception - ' +
+                         str(e))
+
+        return error
+
+    def generatePdf(self, tmpdir, destDir, texdateiObj):
+        """Take a texdatei object, 
+        run it though latex,
+         and produce a PDF file. Copy the file to MEDIA_DIR.
+         Return a path name/  link (?) to the produced file.
+        """
+
+        path = ""
+        error = []
+
+        # run pdflatex on the produced tex file
+        retval = self.runLatex(texdateiObj.filename, tmpdir)
+        if retval['returncode'] is not 0:
+            error = ("Command {} failed with returncode: {} and output {}"
+                     .format(retval['cmd'],retval['returncode'],retval['output'],
+                         ))
+            return ('', error)
+
+
+        # copy the produced PDF file to the destination
+        shutil.copyfile(os.path.join(tmpdir, retval['pdf']),
+                        os.path.join(destDir, retval['pdf']))
+
+        # as well as an arhive
+
+        tmp = os.path.splitext(os.path.basename(texdateiObj.filename))[0]
+        archivename = os.path.join(
+            destDir,
+            tmp,
+        )
+
+        print "archieve name: ", archivename
+        
+        archive = shutil.make_archive(
+            base_name=archivename,
+            format='zip',
+            root_dir=tmpdir,
+        )
+
+
+        # return tuple:
+        path = {}
+        path['pdf'] = settings.MEDIA_URL + "modulhandbuch/" + retval['pdf']
+        path['tgz'] = (settings.MEDIA_URL + "modulhandbuch/" +
+                       re.sub ('.pdf$', '', retval['pdf']) + '.zip')
+
+        return (path, '')
+
+    def get_context_data(self, **kwargs):
+
+        print "in generieren view", kwargs
+
+        globalerror = []
+
+        context = super(Generieren, self).get_context_data(**kwargs)
+
+        # we need a studiengang and its desired start file;
+        # it only makes sense together (typically, one-to-one,
+        # but could be multiple
+
+
+        # get the queryset for the texdatiener to look into
+        studiengang = kwargs['sg']
+        texdatei = kwargs['td']
+
+        print studiengang
+        try:
+            sgObj = models.Studiengang.objects.get(pk=int(studiengang))
+        except Exception as e:
+            print e
+            globalerror += ["Studiengang nicht gefunden"]
+
+        try:
+            tdObj = models.TexDateien.objects.get(pk=int(texdatei))
+        except Exception as e:
+            print e
+            globalerror += ["Texdatei nicht gefunden"]
+
+        if globalerror:
+            context['globalerror'] = globalerror
+            return context
+
+        #######
+        # we found all input data
+
+        # find a temporary directory
+        tmpdir = tempfile.mkdtemp(suffix="modulhandbuch")
+
+        # make sure the desctination directory exists
+        destDir = os.path.join(settings.MEDIA_ROOT, "modulhandbuch")
+        try:
+            os.makedirs(destDir)
+        except:
+            pass
+            # TODO: check for file exists exception only
+        
+        ##########
+        # generate all the latex files for that studiengang
+        latex_renderer = jinja2.Environment(
+            comment_start_string="{###",
+            comment_end_string="###}",
+            # block_start_string = '%{{', # default: {%
+            # block_end_string = '%}',
+            # variable_selftart_string = '%{{', # default: {{
+            # variable_end_string = '%}}', # default: }}
+        )
+
+        for td in sgObj.startdateien.all():
+            error = self.renderTexdateiObj(tmpdir, td, latex_renderer)
+            if error:
+                globalerror += error
+
+        if globalerror:
+            context['globalerror'] = globalerror
+            return context
+
+        # run pdflatex on the chosen startfile and copy into media directory
+        path, globalerror = self.generatePdf(tmpdir, destDir, tdObj)
+
+
+        # delete temp directoy and content
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+        context['globalerror'] = globalerror
+
+        context['path'] = path
+        context['tdObj'] = tdObj
+        context['sgObj'] = sgObj
+
+        print sgObj
+        print tdObj
+        
+        return context

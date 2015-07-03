@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+
+{% block title  %}
+    Modulhandbuch
+{% endblock %}
+{% block breadcrumb %}
+    <li><a href="/">Home</a></li>
+    <li><a href="{% url 'mhbhome' %}">Modulhandbuch</a></li>
+    <li class="active">Generieren</li>
+{% endblock %}
+
+{% block content %}
+
+    <h2>  Modulhandbücher generieren </h2>
+
+    {% comment %}
+    <div class="panel panel-success">
+        <div class="panel-heading" >
+            <div class="panel-title">
+                Alle Studiengänge, alle Versionen 
+            </div>        
+        </div>
+        <div class="panel-body">
+            <div class="list-group">
+                <a href="{% url 'modulhandbuchgenerierenPDF' 0 %}"  class="list-group-item"> Alle </a>
+            </div>
+        </div>
+    </div>
+    {% endcomment %}
+    
+    {% for studiengang, texdateien in files %}
+        <div class="panel panel-success">
+            <div class="panel-heading" >
+                <div class="panel-title">
+                    {{ studiengang }}
+                </div>        
+            </div>
+            <div class="panel-body">
+                {% for t in texdateien  %}
+                    <div class="list-group">
+                        <a href="{% url 'modulhandbuchgenerierenPDF' studiengang.pk t.pk %}"  class="list-group-item"> {{ t }} </a>
+                </div>
+                {% endfor %}
+                
+            </div>
+        </div>
+        
+
+    {% endfor %}
+
+
+{% endblock %}
