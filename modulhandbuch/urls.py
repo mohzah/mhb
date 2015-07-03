@@ -38,7 +38,7 @@ def active_and_login_required(function=None,
 urlpatterns = [
     # TODO: figure out how to limit admin to certain applications
     # TODO: Namen auf modulnamen vereinhetlichen; das hilft bei den breadcrumbs!
-    url(r'/mhbhome.html',
+    url(r'/mhbhome.html$',
         active_and_login_required(
             TemplateView.as_view(template_name="mhome.html")),
         name="mhbhome"),
@@ -62,7 +62,7 @@ urlpatterns = [
     url(r'/fachgebiet$',
         active_and_login_required(views.FachgebieteView.as_view()),
         name="fachgebietList"), 
-    url(r'/fachgebiet/(?P<pk>[0-9]+)',
+    url(r'/fachgebiet/(?P<pk>[0-9]+)$',
         active_and_login_required(views.FachgebieteDetailView.as_view()),
         name="fachgebietDetail"),
     
@@ -126,4 +126,10 @@ urlpatterns = [
     url(r'/focusarea/(?P<pk>[0-9]+)$',
         active_and_login_required(views.FocusAreaDetailView.as_view()),
         name="focusareaDetail"), 
+
+    url(r'/texdatei$',
+        active_and_login_required(views.TexDateienView.as_view()),
+        name="texdateienList"), 
+
 ]
+
