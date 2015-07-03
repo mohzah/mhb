@@ -35,7 +35,8 @@
                     {% endblock %}
                 </ol>
                 <p>
-                    <a href="/accounts/logout">Logout</a>
+                    Willkommen, <strong>{% filter force_escape %}{% firstof user.get_short_name user.get_username user.first_name user.username %} {% endfilter %}</strong>
+                    <br> <a href="/accounts/logout">Logout</a>
                 </p>
                 {% block messages %}
                     {% if messages %}
