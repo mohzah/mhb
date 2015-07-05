@@ -267,7 +267,8 @@ class GenerierenAuswahl(TemplateView):
         context['files'] = [
             (sg, [tex
                   for tex in sg.startdateien.all()
-                  if tex.is_start_file()], )
+                  # if tex.is_start_file()
+              ], )
             for sg in models.Studiengang.objects.all()]
         print context['files']
 
@@ -307,15 +308,25 @@ class Generieren(TemplateView):
 
         return retval
 
-    def renderTexdateiObj(self, tmpdir, texdateiObj,
+    def renderTexdateiObj(self, tmpdir, texdateien,
                           studiengang, startdatei,
-                          latex_renderer):
-        """Take a single texdatei object and turn it
-        into a tex file in the file system
+                          ):
+        """Take a list of texdatei objects and turn them
+        into a tex file in the file system. 
+        Only hit the database once
         """
 
         error = []
 
+        latex_renderer = jinja2.Environment(
+            comment_start_string="{###",
+            comment_end_string="###}",
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
+        
+        ######################
+        # Databae retrieval: 
         # pass in all the generic data, not related to
         # the concrete studiengang
         _lehreinheiten = models.Lehreinheit.objects.all()
@@ -338,93 +349,96 @@ class Generieren(TemplateView):
         # since we have to go via the modules first
         _vlpsQs = models.VeranstaltungsLps.objects.filter(modul__in=_module)
         _lehrveranstaltungen = models.Lehrveranstaltung.objects.filter(veranstaltungslps__in=_vlpsQs).distinct()
-        
+
         ##########################
         # call the renderer for all files in the list
         for texdateiObj in texdateien:
-        try:
-            f = codecs.open(
-                os.path.join(
-                    tmpdir,
-                    texdateiObj.filename),
-                'w', 'utf-8')
+            try:
+                f = codecs.open(
+                    os.path.join(
+                        tmpdir,
+                        texdateiObj.filename),
+                    'w', 'utf-8')
 
-            ltemplate = latex_renderer.from_string(texdateiObj.tex)
+                ltemplate = latex_renderer.from_string(texdateiObj.tex)
 
-            # stuff in all the relevant models so that the template
-            # can iterate over it:
+                # stuff in all the relevant models so that the template
+                # can iterate over it:
 
-            # lehrveranstaltungen = [l for l in
-            #                        models.lehrveranstaltungen.objects.all()]
+                # lehrveranstaltungen = [l for l in
+                #                        models.lehrveranstaltungen.objects.all()]
 
-            r = ltemplate.render(
-                lehreinheiten=_lehreinheiten,
-                fachgebiete=_fachgebiete,
-                pruefungsformen=_pruefungsformen,
-                organisationsformen=_organisationsformen,
-                lehrende=_lehrende,
-                module=_module,
-                focusareas=_focusareas,
-                lehrveranstaltungen=_lehrveranstaltungen,
-                studiengaenge=_studiengaenge,
-                studiengang=studiengang,
-                startdatei=startdatei,
-            )
+                r = ltemplate.render(
+                    lehreinheiten=_lehreinheiten,
+                    fachgebiete=_fachgebiete,
+                    pruefungsformen=_pruefungsformen,
+                    organisationsformen=_organisationsformen,
+                    lehrende=_lehrende,
+                    module=_module,
+                    focusareas=_focusareas,
+                    lehrveranstaltungen=_lehrveranstaltungen,
+                    studiengaenge=_studiengaenge,
+                    studiengang=studiengang,
+                    startdatei=startdatei,
+                )
 
 
-            f.write(r)
-            f.close()
+                f.write(r)
+                f.close()
 
-        except jinja2.TemplateSyntaxError as e:
-            # print e.message
-            # print e.lineno
-            error.append(texdateiObj.filename +
-                         ': Template Syntax Error, ' +
-                         e.message + " at line " + str(e.lineno))
-        except jinja2.TemplateAssertionError as e:
-            error.append(texdateiObj.filename +
-                         ': Template Assertion Error, ' +
-                         e.message + " at line " + str(e.lineno))
-        except Exception as e:
-            error.append(texdateiObj.filename +
-                         ': something went wrong; generic exception - ' +
-                         str(e))
+            except jinja2.TemplateSyntaxError as e:
+                # print e.message
+                # print e.lineno
+                error.append(texdateiObj.filename +
+                             ': Template Syntax Error, ' +
+                             e.message + " at line " + str(e.lineno))
+            except jinja2.TemplateAssertionError as e:
+                error.append(texdateiObj.filename +
+                             ': Template Assertion Error, ' +
+                             e.message + " at line " + str(e.lineno))
+            except Exception as e:
+                error.append(texdateiObj.filename +
+                             ': something went wrong; generic exception - ' +
+                             str(e))
 
         return error
 
-    def generatePdf(self, tmpdir, destDir, texdateiObj):
-        """Take a texdatei object,
-        run it though latex,
+    def generatePdf(self, tmpdir, destDir, startdateien):
+        """Take a list  texdatei object,
+        run them though latex,
          and produce a PDF file. Copy the file to MEDIA_DIR.
          Return a path name/  link (?) to the produced file.
         """
 
         # we store all the produced paths in here:
-        path = {}
+        pdfs = []
 
         # a list of error messages, to render in the template:
         error = []
 
         # run pdflatex on the produced tex file
-        if texdateiObj.is_start_file():
-            retval = self.runLatex(texdateiObj.filename, tmpdir)
-        else:
-            retval = {}
-            retval['returncode'] = -1
-            retval['cmd'] = "Keine Ausführung von pdflatex, da kein documentclass"
-            retval['output'] = ""
+        for texdateiObj in startdateien:
+            res = {'name': texdateiObj.filename}
+            if texdateiObj.is_start_file():
+                retval = self.runLatex(texdateiObj.filename, tmpdir)
+            else:
+                retval = {}
+                retval['returncode'] = -1
+                retval['cmd'] = "Keine Ausführung von pdflatex, da kein documentclass"
+                retval['output'] = ""
 
-        if retval['returncode'] is not 0:
-            error = ("Command {} failed with returncode: {} and output {}"
-                     .format(retval['cmd'],retval['returncode'],retval['output'],
-                         ))
-            path['pdf'] = ""
-        else:
-            # copy the produced PDF file to the destination
-            shutil.copyfile(os.path.join(tmpdir, retval['pdf']),
-                            os.path.join(destDir, retval['pdf']))
-            path['pdf'] = settings.MEDIA_URL + "modulhandbuch/" + retval['pdf']
+            if retval['returncode'] is not 0:
+                error = ("Command {} failed with returncode: {} and output {}"
+                         .format(retval['cmd'],retval['returncode'],retval['output'],
+                             ))
+                res['pdf'] = ""
+            else:
+                # copy the produced PDF file to the destination
+                shutil.copyfile(os.path.join(tmpdir, retval['pdf']),
+                                os.path.join(destDir, retval['pdf']))
+                res['pdf'] = settings.MEDIA_URL + "modulhandbuch/" + retval['pdf']
 
+            pdfs.append(res)
         # as well as an archive
         tmp = os.path.splitext(os.path.basename(texdateiObj.filename))[0]
         archivename = os.path.join(
@@ -442,9 +456,9 @@ class Generieren(TemplateView):
         )
 
         # TODO: make the URL to the archiv more meaningful
-        path['tgz'] = (settings.MEDIA_URL + "modulhandbuch/archiv.zip")
-
-        return (path, error)
+        archivepath = (settings.MEDIA_URL + "modulhandbuch/archiv.zip")
+        
+        return (pdfs, archivepath, error)
 
     def get_context_data(self, **kwargs):
 
@@ -460,25 +474,26 @@ class Generieren(TemplateView):
 
 
         # get the queryset for the texdatiener to look into
-        studiengang = kwargs['sg']
-        texdatei = kwargs['td']
 
-        print studiengang
         try:
+            studiengang = kwargs['sg']
             sgObj = models.Studiengang.objects.get(pk=int(studiengang))
         except Exception as e:
             print e
             globalerror += ["Studiengang nicht gefunden"]
-
-        try:
-            tdObj = models.TexDateien.objects.get(pk=int(texdatei))
-        except Exception as e:
-            print e
-            globalerror += ["Texdatei nicht gefunden"]
-
+            
         if globalerror:
             context['globalerror'] = globalerror
             return context
+            
+        try:
+            texdatei = kwargs['td']
+            startdateien = models.TexDateien.objects.filter(pk=int(texdatei))
+        except Exception as e:
+            # this is not necessarily an error; means the user
+            # wants to run on all the startdatei of 
+            startdateien = sgObj.startdateien.all()
+            
 
         #######
         # we found all input data
@@ -496,21 +511,16 @@ class Generieren(TemplateView):
 
         ##########
         # generate all the latex files for that studiengang
-        latex_renderer = jinja2.Environment(
-            comment_start_string="{###",
-            comment_end_string="###}",
-            # block_start_string = '%{{', # default: {%
-            # block_end_string = '%}',
-            # variable_selftart_string = '%{{', # default: {{
-            # variable_end_string = '%}}', # default: }}
+        # actually, we simplify here: we just run the renderer
+        # on ALL Texdateien. Not the most efficient thing to do,
+        # but much easier than trying to figure out with
+        # files are inlined by the startdateien
+            
+        globalerror += self.renderTexdateiObj(
+            tmpdir,
+            models.TexDateien.objects.all(),
+            sgObj, startdateien,
         )
-
-        for td in sgObj.startdateien.all():
-            error = self.renderTexdateiObj(tmpdir, td,
-                                           sgObj, tdObj,
-                                           latex_renderer)
-            if error:
-                globalerror += error
 
         if globalerror:
             context['globalerror'] = globalerror
@@ -518,19 +528,17 @@ class Generieren(TemplateView):
 
         # run pdflatex on the chosen startfile and copy into media directory
         # limiting to files with documnetclass in them: mostly a debugging aid
-        path, globalerror = self.generatePdf(tmpdir, destDir, tdObj)
+        pdfs, archivepath, globalerror = self.generatePdf(tmpdir, destDir, startdateien)
 
 
         # delete temp directoy and content
         shutil.rmtree(tmpdir, ignore_errors=True)
 
+        # collect all the results in context and return 
         context['globalerror'] = globalerror
-
-        context['path'] = path
-        context['tdObj'] = tdObj
+        context['pdfs'] = pdfs
+        context['tdObj'] = startdateien
         context['sgObj'] = sgObj
-
-        print sgObj
-        print tdObj
-
+        context['archivepath'] = archivepath
+        
         return context

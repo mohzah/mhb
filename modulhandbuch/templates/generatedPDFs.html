@@ -2,52 +2,59 @@
 
 
 {% block title  %}
-    Modulhandbuch
+Modulhandbuch
 {% endblock %}
 {% block breadcrumb %}
-    <li><a href="/">Home</a></li>
-    <li><a href="{% url 'mhbhome' %}">Modulhandbuch</a></li>
-    <li><a href="{% url 'modulhandbuchgenerieren' %}">Generieren </a></li>
-    <li class="active"> Generierte Daten </li>
+<li><a href="/">Home</a></li>
+<li><a href="{% url 'mhbhome' %}">Modulhandbuch</a></li>
+<li><a href="{% url 'modulhandbuchgenerieren' %}">Generieren </a></li>
+<li class="active"> Generierte Daten </li>
+{% endblock %}
+
+{% block messages %}
+<div class="alert alert-danger">
+{% if globalerror %}
+Fehler! <br>{{ globalerror }}
+    {% endif %}
+</div>
 {% endblock %}
 
 {% block content %}
 
-    <h2>  Generierte Modulhandbücher </h2>
+<h2>  Generierte Modulhandbücher für {{ sgObj.nameDe }} </h2>
 
-    {% if globalerror %}
-        {{ globalerror }}
-        <p>
-    {% endif %}
+<ul>
+    {% for pdf in pdfs %}
+    {% if pdf.pdf %}
+    <li>  {{ pdf.name }}:  <a href="{{ pdf.pdf }}"> PDF </a> </li>
+    {% else %}
+    <li> {{ pdf.name }}: Kein PDF erzeugt </li>
+    {% endif %} 
+    {% endfor %}
+    <li> <a href="{{ archivepath }}"> ZIP </a> </li>
+</ul>
 
-    <ul>
-        <li> <a href="{{ path.pdf }}"> PDF </a> </li>
-        <li> <a href="{{ path.tgz }}"> ZIP </a> </li>
-        <li> {{ tdObj }} </li>
-        <li> {{ sgObj.nameDe }} </li>
-    </ul>
-    
-    {% comment %}
-    <div class="panel panel-success">
-        <div class="panel-heading" >
-            <div class="panel-title">
-                PDFs
-            </div>        
-        </div>
-        <div class="panel-body">
-                <div class="list-group">
-                    {% if error %}
-                        Fehler bei {{ tex }}: {{ error }}
-                    {% else %}
-                        {{ tex }}
-                        <a href="{{ path.pdf }}"  class="list-group-item"> PDF   </a>
-                        <a href="{{ path.tgz }}"  class="list-group-item"> TGZ   </a>
-                    {% endif %}
-                </div>
-            
-        </div>
+{% comment %}
+<div class="panel panel-success">
+    <div class="panel-heading" >
+        <div class="panel-title">
+            PDFs
+        </div>        
     </div>
-    {% endcomment %}
+    <div class="panel-body">
+        <div class="list-group">
+            {% if error %}
+            Fehler bei {{ tex }}: {{ error }}
+            {% else %}
+            {{ tex }}
+            <a href="{{ path.pdf }}"  class="list-group-item"> PDF   </a>
+            <a href="{{ path.tgz }}"  class="list-group-item"> TGZ   </a>
+            {% endif %}
+        </div>
+        
+    </div>
+</div>
+{% endcomment %}
 
 
 {% endblock %}
