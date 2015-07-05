@@ -330,31 +330,18 @@ class Generieren(TemplateView):
         # desired studiengang
         # (the "all" versions are just to ease testing)
         
-        # _module = models.Modul.objects.all()
-
-        # Test code: it really has to be qs on Modul, else the
-        # templates get confused 
-        # a = models.Modul.objects.all()
-        # b = studiengang.module.all()
-        # c = models.Modul.objects.filter(studiengang__id=studiengang.id)
-        # print "a: ", type(a), a
-        # print "b: ", type(b), b
-        # print "c: ", type(c), c
-
         _module = models.Modul.objects.filter(studiengang__id=studiengang.id)
         
-        # _focusareas = models.FocusArea.objects.all()
         _focusareas=models.FocusArea.objects.filter(studiengang__id=studiengang.id)
 
         # more complicated for the lehrveranstaltungen,
         # since we have to go via the modules first
         _vlpsQs = models.VeranstaltungsLps.objects.filter(modul__in=_module)
-        print _vlpsQs
+        _lehrveranstaltungen = models.Lehrveranstaltung.objects.filter(veranstaltungslps__in=_vlpsQs).distinct()
         
-        # _lehrveranstaltungen = models.Lehrveranstaltung.objects.all()
-        _lehrveranstaltungen = models.Lehrveranstaltung.objects.filter(veranstaltungslps__in=_vlpsQs)
-        print _lehrveranstaltungen
-        
+        ##########################
+        # call the renderer for all files in the list
+        for texdateiObj in texdateien:
         try:
             f = codecs.open(
                 os.path.join(
