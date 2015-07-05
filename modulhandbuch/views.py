@@ -325,13 +325,36 @@ class Generieren(TemplateView):
         _lehrende = models.Lehrender.objects.all()
         _studiengaenge = models.Studiengang.objects.all()
 
-        # FIX: only the actual ones 
+        # for module, focusarea and lehrveranstaltungen: pass only
+        # those objects into the rendered that actually pertain to the
+        # desired studiengang
+        # (the "all" versions are just to ease testing)
         
-        _module = models.Modul.objects.all()
-        _focusareas = models.FocusArea.objects.all()
+        # _module = models.Modul.objects.all()
 
-        _lehrveranstaltungen = models.Lehrveranstaltung.objects.all()
+        # Test code: it really has to be qs on Modul, else the
+        # templates get confused 
+        # a = models.Modul.objects.all()
+        # b = studiengang.module.all()
+        # c = models.Modul.objects.filter(studiengang__id=studiengang.id)
+        # print "a: ", type(a), a
+        # print "b: ", type(b), b
+        # print "c: ", type(c), c
 
+        _module = models.Modul.objects.filter(studiengang__id=studiengang.id)
+        
+        # _focusareas = models.FocusArea.objects.all()
+        _focusareas=models.FocusArea.objects.filter(studiengang__id=studiengang.id)
+
+        # more complicated for the lehrveranstaltungen,
+        # since we have to go via the modules first
+        _vlpsQs = models.VeranstaltungsLps.objects.filter(modul__in=_module)
+        print _vlpsQs
+        
+        # _lehrveranstaltungen = models.Lehrveranstaltung.objects.all()
+        _lehrveranstaltungen = models.Lehrveranstaltung.objects.filter(veranstaltungslps__in=_vlpsQs)
+        print _lehrveranstaltungen
+        
         try:
             f = codecs.open(
                 os.path.join(
@@ -353,19 +376,12 @@ class Generieren(TemplateView):
                 pruefungsformen=_pruefungsformen,
                 organisationsformen=_organisationsformen,
                 lehrende=_lehrende,
-                # restrict LVs, Module, FAs, to the particular Studiengang!
-                # the "all" version are only to ease testing
                 module=_module,
-                # module=studiengang.module.all(),
                 focusareas=_focusareas,
-                # focusareas=studiengang.focusareas.all(),
-                # only pass in those lehrveranstaltungen
-                # that appear in the studiengang
                 lehrveranstaltungen=_lehrveranstaltungen,
-                # lehrveranstaltungen=lehrveranstaltungen,
                 studiengaenge=_studiengaenge,
-                                 studiengang=studiengang,
-                                 startdatei=startdatei,
+                studiengang=studiengang,
+                startdatei=startdatei,
             )
 
 
@@ -390,13 +406,13 @@ class Generieren(TemplateView):
         return error
 
     def generatePdf(self, tmpdir, destDir, texdateiObj):
-        """Take a texdatei object, 
+        """Take a texdatei object,
         run it though latex,
          and produce a PDF file. Copy the file to MEDIA_DIR.
          Return a path name/  link (?) to the produced file.
         """
 
-        # we store all the produced paths in here: 
+        # we store all the produced paths in here:
         path = {}
 
         # a list of error messages, to render in the template:
@@ -410,7 +426,7 @@ class Generieren(TemplateView):
             retval['returncode'] = -1
             retval['cmd'] = "Keine Ausführung von pdflatex, da kein documentclass"
             retval['output'] = ""
-        
+
         if retval['returncode'] is not 0:
             error = ("Command {} failed with returncode: {} and output {}"
                      .format(retval['cmd'],retval['returncode'],retval['output'],
@@ -431,7 +447,7 @@ class Generieren(TemplateView):
 
         print "destDir: ", destDir
         print "archieve name: ", archivename
-        
+
         archive = shutil.make_archive(
             base_name=archivename,
             format='zip',
@@ -440,7 +456,7 @@ class Generieren(TemplateView):
 
         # TODO: make the URL to the archiv more meaningful
         path['tgz'] = (settings.MEDIA_URL + "modulhandbuch/archiv.zip")
-                       
+
         return (path, error)
 
     def get_context_data(self, **kwargs):
@@ -490,7 +506,7 @@ class Generieren(TemplateView):
         except:
             pass
             # TODO: check for file exists exception only
-        
+
         ##########
         # generate all the latex files for that studiengang
         latex_renderer = jinja2.Environment(
@@ -504,7 +520,7 @@ class Generieren(TemplateView):
 
         for td in sgObj.startdateien.all():
             error = self.renderTexdateiObj(tmpdir, td,
-                                           sgObj, tdObj, 
+                                           sgObj, tdObj,
                                            latex_renderer)
             if error:
                 globalerror += error
@@ -529,5 +545,5 @@ class Generieren(TemplateView):
 
         print sgObj
         print tdObj
-        
+
         return context
