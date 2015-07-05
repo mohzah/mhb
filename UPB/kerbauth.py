@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 
 import kerberos
+import getent
 
 
 class KerbAuth(ModelBackend):
@@ -22,27 +23,31 @@ class KerbAuth(ModelBackend):
         except kerberos.BasicAuthError:
             # print "Kerberos auth failed"
             return None
-
+        
         # print "kerberos succeeded"
+
+        # TODO: enable this once we have a suitable group set up
+        if False and settings.RUN_ON_WEBAPP:
+            webappgroup = dict(getent.group('webapp'))
+            if username not in webappgroup['members']:
+                return None
 
         user, created = User.objects.get_or_create(
             username=username
         )
 
         # print "user, created: ", user, type(user), created
-        if settings.RUN_ON_WEBAPP:
-            import getent
-            webappgroup = dict(getent.group('webapp'))
-            if user not in webappgroup['members']:
-                return None
 
         if created:
             # no local password for such users
             user.set_unusable_password()
 
-            # allow access to admin:
+            # allow everybody access to admin:
             user.is_staff = True
 
+            # we do not make anybody superuser here;
+            # that should happen manually
+            
             try:
                 # have to set a reasonable default group
                 g = Group.objects.get(name="lehrender")
