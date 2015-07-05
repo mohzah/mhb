@@ -2,9 +2,14 @@
 
 
 from django.contrib import admin
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+
 from modulhandbuch.models import *
 
-# Option with easy_select2: 
+import re
+
+# Option with easy_select2:
 from easy_select2 import select2_modelform
 
 ## a basic admin to add ownership
@@ -15,17 +20,17 @@ class OwnedAdmin(admin.ModelAdmin):
         res = super(OwnedAdmin, self).__init__(*args, **kwargs)
 
         # self.realInlines = self.inlines
-        
-        # construct the field names to show: 
+
+        # construct the field names to show:
         tmp = [f.name for f in self.model._meta.fields]
-        try: 
+        try:
             tmp.remove('id')
             tmp.remove('owner')
             tmp.remove('namedentity_ptr')
             tmp.remove('slug')
         except:
             # not all fields might be in all modules,
-            # but that is not a problem 
+            # but that is not a problem
             pass
         self.fields = tmp
 
@@ -38,23 +43,23 @@ class OwnedAdmin(admin.ModelAdmin):
 
         self.message_user(request,
                           u"Es werden nur Einträge angezeigt, die Sie editieren dürfen!")
-        
+
         return qs.filter(owner=request.user)
 
     def save_model(self, request, obj, form, change):
         # print "--------------"
         # print "in save_model: ", obj, obj.owner, change, request.user
-        
+
         if (change is False) or (obj.owner is None):
             obj.owner = request.user
         obj.save()
 
-    # TODO: 
+    # TODO:
     # die folgenden Funktionen werden eigentlich nicht gebraucht,
     # wenn über get_queryset auf owner eingeschröänkt wird.
     # Es kann trotzdem nicht schaden, falls jemand direkt die URL manipuliert
     # es fehlt hier noch die has_change_permission!
-    
+
     def has_delete_permission(self, request, obj=None):
         print "has delete: ", obj, request.user, request.user.is_superuser
         if obj:
@@ -91,20 +96,56 @@ class OwnedAdmin(admin.ModelAdmin):
     # def get_formsets_with_inlines(self, request, obj=None):
     #     for inline in self.get_inline_instances(request, obj):
     #         yield inline.get_formset(request, obj), inline
-    
+
     # def change_view(self, request, object_id, form_url='', extra_context=None):
     #     obj = self.model.objects.get(pk=object_id)
     #     print "in change_veiw ", obj
-        
+
     #     # if obj and not (obj.owner == request.user):
-    #     #     print "disable editing of inlines" 
+    #     #     print "disable editing of inlines"
     #     #     self.inlines = []
-            
+
     #     return super(OwnedAdmin, self).change_view(request,
     #                                                object_id,
     #                                                form_url, extra_context)
-        
 
+    # override the HttpResponse hooks:
+    def my_response_url(self, request, obj):
+        # redirect back to the survey page for this model
+        try:
+            urlname = obj.__class__.__name__.lower() + "List"
+            url = reverse(urlname)
+        except:
+            # this exception should only happen if the url names
+            # dont match the expected patterns
+            url = reverse("modulhandbuchansehen")
+
+        return url
+
+    def response_change(self, request, obj):
+        if '_continue' not in request.POST:
+            return HttpResponseRedirect(self.my_response_url(request, obj))
+        else:
+            return super(OwnedAdmin, self).response_change(request, obj)
+
+    def response_delete(self, request, obj_display, obj_id):
+
+        if '_continue' not in request.POST:
+            # since no object exists, it is harder to find out the class
+            # let's detour via the URL 
+            r = re.match('.*/modulhandbuch/([^/]*)/.*', request.path)
+            urlname = r.group(1) + 'List'
+            return HttpResponseRedirect(reverse(urlname))
+        else:
+            return super(OwnedAdmin, self).response_delete(request,
+                                                       obj_display, obj_id) 
+
+    def response_add(self, request, obj, post_url_continue=None):
+        if '_continue' not in request.POST:
+            return HttpResponseRedirect(self.my_response_url(request, obj))
+        else:
+            return super(OwnedAdmin, self).response_add(request,
+                                                        obj, post_url_continue)
 
 ModulForm = select2_modelform(Modul, attrs={'width': '250px'})
 
@@ -122,7 +163,7 @@ class ModulLVInline(OwnedInline):
     model = VeranstaltungsLps
     # TODO: select2_modelform zeigt alle möglichen keys an,
     # in einem ersten select field, das gart nicht angezeigt
-    # werden sollte. Das ist ein killer bug :-( 
+    # werden sollte. Das ist ein killer bug :-(
 
     # form = select2_modelform(VeranstaltungsLps, attrs={'width': '250px'})
     fk_name = "modul"
@@ -144,7 +185,7 @@ class ModulLVInline(OwnedInline):
     #     pass
 
 
-        
+
 ###############################
 # patch the classes together
 
@@ -159,7 +200,7 @@ class ModulAdmin(OwnedAdmin):
 class FocusAreaModulInline(admin.TabularInline):
     model = FocusArea.module.through
 
-    
+
 class FocusAreaAdmin(admin.ModelAdmin):
     # inlines = [FocusAreaModulInline]
     form = select2_modelform(FocusArea, attrs={'width': '250px'})
@@ -179,7 +220,7 @@ class StudiengangModuleInline(admin.TabularInline):
     model = Studiengang.module.through
     verbose_name = "Modul dieses Studiengangs"
     verbose_name_plural = "Module dieses Studiengangs"
-    
+
 
 class StudiengangAdmin(admin.ModelAdmin):
     model = Studiengang
