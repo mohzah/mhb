@@ -137,12 +137,13 @@ LOGIN_REDIRECT_URL = '/'
 if os.environ.get('DB_HOST'):
     # Absolute filesystem path to the directory that will hold user-uploaded files.
     # Example: "/var/www/example.com/media/"
-    MEDIA_ROOT = '/data/apps/modulhandbuch/media'
+    # MEDIA_ROOT = '/data/apps/mhb/modulhandbuch/media'
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
     # URL that handles the media served from MEDIA_ROOT. Make sure to use a
     # trailing slash.
     # Examples: "http://example.com/media/", "http://media.example.com/"
     MEDIA_URL = '/media/'
 else:
-    MEDIA_ROOT = os.path.join (BASE_DIR, "media")
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
     MEDIA_URL = '/media/'
