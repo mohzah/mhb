@@ -6,6 +6,7 @@ from autoslug import AutoSlugField
 from django.contrib.auth.models import User
 
 import re
+import math
 
 ############
 # abstract base classes
@@ -21,7 +22,7 @@ class OwnedEntity(models.Model):
     def can_edit(self, user):
         """Every super user can edit,
         and the owner"""
-        
+
         return (user.is_superuser or
                 user == self.owner)
 
@@ -114,12 +115,21 @@ class SWSEntity(ResponsibleEntity):
                                               help_text="Description of other parts of the lecture")
     selbststudium = models.IntegerField(default=0,
                                         help_text=
-                                        u"""Arbeitsaufwand für Selbststudium 
-                                        (in Stunden); für Berechnung des 
+                                        u"""Arbeitsaufwand für Selbststudium
+                                        (in Stunden); für Berechnung des
                                         gesamten Arbeitsaufwandes.
                                         """,
     )
-    
+
+    @property
+    def arbeitsaufwand(self):
+        """Compute arbeitsaufwand in hours, based on SWS
+        and selbststudium.
+        """
+        return int(math.ceil(
+            15*1.5*(self.swsVl + self.swsUe + self.swsSonst) +
+            self.selbststudium))
+
     sprache = models.CharField(max_length=2,
                                choices=(('DE', 'Deutsch'),
                                         ('EN', 'English'), ),
@@ -149,19 +159,19 @@ class Fachgebiet(NamedEntity):
                                blank=True,
                                help_text=u"Kürzel des Fachgebiets")
     display_fields = ['nameDe', 'nameEn', 'kuerzel', 'url']
-    
+
     class Meta:
         verbose_name_plural = "Fachgebiete"
         verbose_name = "Fachgebiet"
 
-        
+
 class Pruefungsform(DescribedEntity):
     display_fields = ['nameDe', 'nameEn', 'beschreibungDe', 'beschreibungEn']
-    
+
     class Meta:
         verbose_name = u"Prüfungsform"
         verbose_name_plural = u"Prüfungsformen"
-    
+
 
 class Organisationsform(DescribedEntity):
     display_fields = ['nameDe', 'nameEn', 'beschreibungDe', 'beschreibungEn']
@@ -172,7 +182,7 @@ class Organisationsform(DescribedEntity):
 
 class Lehrender(URLEntity):
     display_fields = ['name', 'titel', 'url', 'fachgebiet', 'lehreinheit']
-    
+
     name = models.CharField(max_length=200)
     titel = models.CharField(max_length=100,
                              blank=True)
@@ -181,7 +191,7 @@ class Lehrender(URLEntity):
 
     class Meta:
         verbose_name_plural = "Lehrende"
-        verbose_name = "Lehrende(r)" 
+        verbose_name = "Lehrende(r)"
 
     def __unicode__(self):
         return self.titel + ' ' + self.name
@@ -210,7 +220,7 @@ class Lehrveranstaltung(SWSEntity):
                               help_text=u"Typischer Durchführungstermin")
     zielsemester = models.IntegerField(default=0,
                                        help_text="Sollsemester, 0: beliebig")
-    
+
     # kurzbeschreibungDe = models.TextField(blank=True)
     # kurzbeschreibungEn = models.TextField(blank=True)
     inhaltDe = models.TextField(blank=True,
@@ -268,9 +278,9 @@ class Modul(ExaminedEntity):
 
     display_fields = ['nameDe', 'nameEn',
                       'verantwortlicher',
-                      'pruefung', 
+                      'pruefung',
                       'beschreibungDe', 'beschreibungEn',
-                      'lps', 'pflicht', 'anzahlLvs', 
+                      'lps', 'pflicht', 'anzahlLvs',
                       'organisation',
                       'lernzieleDe', 'lernzieleEn',
                       'bemerkungDe', 'bemerkungEn',
@@ -278,7 +288,7 @@ class Modul(ExaminedEntity):
     lps = models.IntegerField(default=0,
                               help_text=
                               u"Anzahl Leistungspunkte. Wird gegen Anzahl LVs und LPs pro LV geprüft.")
-    
+
     organisation = models.ForeignKey(Organisationsform,
                                      help_text=u"Art der Durchführung des Moduls")
 
@@ -291,7 +301,7 @@ class Modul(ExaminedEntity):
                                    help_text=
                                    "Sonstige Bemerkungen")
     bemerkungEn = models.TextField(blank=True)
-    
+
     pflicht = models.BooleanField(default=False)
 
     anzahlLvs = models.IntegerField(default=0,
@@ -332,9 +342,9 @@ class FocusArea(ResponsibleEntity):
         'url',
         'verantwortlicher',
         'beschreibungDe', 'beschreibungEn']
-    
+
     module = models.ManyToManyField(Modul)
-    
+
     class Meta:
         verbose_name = "Studienrichtung  (Focus Area)"
         verbose_name_plural = "Studienrichtungen  (Focus Areas)"
@@ -346,14 +356,15 @@ class Studiengang(ResponsibleEntity):
     startdateien = models.ManyToManyField("TexDateien",
                                           verbose_name="Benutzte Dateien",
                                           help_text="Welche Tex-Dateien werden für dieesen Studiengang benötigt?")
-    
+    # TODO: de, en , both Versionen der Startdateien?
+
     class Meta:
         verbose_name = "Studiengang"
         verbose_name_plural = u"Studiengänge"
 
 
 class TexDateien (models.Model):
-    # add description, make filename unique! 
+    # add description, make filename unique!
     filename = models.CharField(max_length=100)
     description = models.CharField(max_length=200, blank=True)
     tex = models.TextField()
@@ -363,13 +374,12 @@ class TexDateien (models.Model):
         verbose_name_plural = "Tex-Dateien/allgemeine Templates"
 
     def is_start_file(self):
-        """check whether the tex code contains 
+        """check whether the tex code contains
         documentclass command. We assume that this means
         it should be translated by pdflatex.
         """
 
         return "documentclass" in self.tex
-        
+
     def __unicode__(self):
         return self.filename
-
