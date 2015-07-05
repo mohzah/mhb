@@ -12,11 +12,11 @@ Modulhandbuch
 {% endblock %}
 
 {% block messages %}
-<div class="alert alert-danger">
 {% if globalerror %}
+<div class="alert alert-danger">
 Fehler! <br>{{ globalerror }}
-    {% endif %}
 </div>
+{% endif %}
 {% endblock %}
 
 {% block content %}
