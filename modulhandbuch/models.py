@@ -206,7 +206,7 @@ class Lehrveranstaltung(SWSEntity):
                       'termin',
                       'zielsemester',
                       'inhaltDe', 'inhaltEn',
-                      'lernergebnisDe', 'lernergebnisDe',
+                      'lernergebnisDe', 'lernergebnisEn',
                       'methodikDe', 'methodikEn',
                       'vorkenntnisseDe', 'vorkenntnisseEn',
                       'materialDe', 'materialEn',
