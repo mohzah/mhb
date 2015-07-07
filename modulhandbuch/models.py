@@ -83,7 +83,8 @@ class DescribedEntity(NamedEntity):
 
 class ResponsibleEntity(DescribedEntity):
     verantwortlicher = models.ForeignKey('Lehrender',
-                                         help_text="Verantwortlicher Lehrerende(r)")
+                                         verbose_name="Verantwortlicher Lehrerende(r)",
+                                         help_text=u"Wer ist für die Durchführung/Organisation verantwortlich (muss nicht notwendig selbst durchführen)?")
 
     # note: class name here as a string, to avoid conflicts
     # with forward references not possible
@@ -96,6 +97,7 @@ class ExaminedEntity(ResponsibleEntity):
     pruefung = models.ForeignKey('Pruefungsform',
                                  blank=True,
                                  null=True,
+                                 verbose_name=u"Prüfungsform",
                                  help_text=u"Prüfungsform; ggf. neu anlegen.")
 
     class Meta:
@@ -104,16 +106,22 @@ class ExaminedEntity(ResponsibleEntity):
 
 class SWSEntity(ResponsibleEntity):
     swsVl = models.IntegerField(default=0,
+                                verbose_name="SWS Vorlesung",
                                 help_text=u"Anzahl SWS für Vorlesungsanteil")
     swsUe = models.IntegerField(default=0,
+                                verbose_name=u"SWS Übung",
                                 help_text=u"Anzahl SWS für Übungen")
     swsSonst = models.IntegerField(default=0,
+                                   verbose_name="Sonstige SWS",
                                    help_text=u"Anzahl SWS für andere Bestandteile")
     swsSonstBeschreibungDe = models.CharField(max_length=300, blank=True,
+                                              verbose_name="Beschreibung",
                                               help_text="Beschreibung anderer Bestandteile")
     swsSonstBeschreibungEn = models.CharField(max_length=300, blank=True,
+                                              verbose_name="Beschreibung (engl.)",
                                               help_text="Description of other parts of the lecture")
     selbststudium = models.IntegerField(default=0,
+                                        verbose_name="Selbststudium",
                                         help_text=
                                         u"""Arbeitsaufwand für Selbststudium
                                         (in Stunden); für Berechnung des
@@ -134,6 +142,7 @@ class SWSEntity(ResponsibleEntity):
                                choices=(('DE', 'Deutsch'),
                                         ('EN', 'English'), ),
                                default = 'EN',
+                               verbose_name="Sprache",
                                help_text=u"Sprache der Durchführung")
 
     class Meta:
@@ -157,6 +166,7 @@ class Fachgebiet(NamedEntity):
 
     kuerzel = models.CharField(max_length=10,
                                blank=True,
+                               verbose_name=u"Kürzel",
                                help_text=u"Kürzel des Fachgebiets")
     display_fields = ['nameDe', 'nameEn', 'kuerzel', 'url']
 
@@ -183,11 +193,15 @@ class Organisationsform(DescribedEntity):
 class Lehrender(URLEntity):
     display_fields = ['name', 'titel', 'url', 'fachgebiet', 'lehreinheit']
 
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200,
+                            help_text="Vor- und Nachname")
     titel = models.CharField(max_length=100,
-                             blank=True)
-    fachgebiet = models.ForeignKey('Fachgebiet')
-    lehreinheit = models.ForeignKey('Lehreinheit')
+                             blank=True,
+                             help_text="Akademischer Titel")
+    fachgebiet = models.ForeignKey('Fachgebiet',
+                                   help_text=u"Welchem Fachgebiet gehört Lehrende(r) an?")
+    lehreinheit = models.ForeignKey('Lehreinheit',
+                                    help_text=u"Welcher Lehreinheit (typisch: Institut) gehört Lehrende(r) an?")
 
     class Meta:
         verbose_name_plural = "Lehrende"
@@ -229,16 +243,23 @@ class Lehrveranstaltung(SWSEntity):
     lernergebnisDe = models.TextField(blank=True,
                                       help_text=
                                       "Kompetenzorientierte Beschreibung")
-    lernergebnisEn = models.TextField(blank=True)
+    lernergebnisEn = models.TextField(blank=True,
+                                      help_text=
+                                      "Kompetenzorientierte Beschreibung (engl.)")
     methodikDe = models.TextField(blank=True,
                                   help_text="Beschreibung der Lehrmethoden")
-    methodikEn = models.TextField(blank=True)
-    vorkenntnisseDe = models.TextField(blank=True)
-    vorkenntnisseEn = models.TextField(blank=True)
+    methodikEn = models.TextField(blank=True,
+                                  help_text="Beschreibung der Lehrmethoden (engl.)")
+    vorkenntnisseDe = models.TextField(blank=True,
+                                       help_text="Sinnvolle Vorkenntnisse")
+    vorkenntnisseEn = models.TextField(blank=True,
+                                       help_text="Sinnvolle Vorkenntnisse (engl.)")
     # kombinationDe = models.TextField(blank=True)
     # kombinationEn = models.TextField(blank=True)
-    materialDe = models.TextField(blank=True)
-    materialEn = models.TextField(blank=True)
+    materialDe = models.TextField(blank=True,
+                                  help_text="Materialien für die Vorlesung")
+    materialEn = models.TextField(blank=True,
+                                  help_text="Materialien für die Vorlesung (englische Beschreibung)")
 
     def in_modul(self, modul):
         """A little helper function: check if this
@@ -287,7 +308,7 @@ class Modul(ExaminedEntity):
                   ]
     lps = models.IntegerField(default=0,
                               help_text=
-                              u"Anzahl Leistungspunkte. Wird gegen Anzahl LVs und LPs pro LV geprüft.")
+                              u"Anzahl Leistungspunkte.")
 
     organisation = models.ForeignKey(Organisationsform,
                                      help_text=u"Art der Durchführung des Moduls")
@@ -295,14 +316,20 @@ class Modul(ExaminedEntity):
     lernzieleDe = models.TextField(blank=True,
                                    help_text=
                                    "Kurzbeschreibung der erworbenen Fertigkeiten, kompetenzorientiert.")
-    lernzieleEn = models.TextField(blank=True)
+    lernzieleEn = models.TextField(blank=True,
+                                   help_text=
+                                   "Kurzbeschreibung der erworbenen Fertigkeiten, kompetenzorientiert (engl.).")
 
     bemerkungDe = models.TextField(blank=True,
                                    help_text=
                                    "Sonstige Bemerkungen")
-    bemerkungEn = models.TextField(blank=True)
+    bemerkungEn = models.TextField(blank=True,
+                                   help_text=
+                                   "Sonstige Bemerkungen (engl.)")
 
-    pflicht = models.BooleanField(default=False)
+    pflicht = models.BooleanField(default=False,
+                                  help_text=
+                                  "Ist das eine Pflichtmodul?")
 
     anzahlLvs = models.IntegerField(default=0,
                                     help_text=u"Wie viele Lehrveranstaltungen müssen in diesem Modul belegt werden in diesem Modul? Zur Berechung des Arbeitsaufwandes notwendig.")
