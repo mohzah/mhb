@@ -100,6 +100,7 @@ class TexDateienView(SimpleListView):
 #########################################
 # Views for the detailed disaply of an entry
 
+
 class SimpleDetailView(DetailView):
     """A simple view to construct a per-object detail view.
     Similar to SimpleListView, it tries to grab meta data from the class.
@@ -112,6 +113,7 @@ class SimpleDetailView(DetailView):
     modelname = ""
 
     def get_context_data(self, **kwargs):
+
         context = super(SimpleDetailView, self).get_context_data(**kwargs)
 
         context['title'] = (self.title
@@ -191,6 +193,10 @@ class PruefungsformDetailView(SimpleDetailView):
     model = models.Pruefungsform
 
 
+class TexDateienDetailView(SimpleDetailView):
+    model = models.TexDateien
+
+
 class ModuleDetailView(SimpleDetailView):
     model = models.Modul
 
@@ -229,7 +235,7 @@ class FocusAreaDetailView(SimpleDetailView):
 
         return context
 
-
+    
 class StudiengangDetailView(SimpleDetailView):
     model = models.Studiengang
     # TODO: list foriegn keys

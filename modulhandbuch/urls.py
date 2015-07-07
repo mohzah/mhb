@@ -139,6 +139,9 @@ urlpatterns = [
     url(r'/texdatei$',
         active_and_login_required(views.TexDateienView.as_view()),
         name="texdateienList"), 
+    url(r'/texdateien/(?P<pk>[0-9]+)$',
+        active_and_login_required(views.TexDateienDetailView.as_view()),
+        name="texdateienDetail"),
 
 ]
 

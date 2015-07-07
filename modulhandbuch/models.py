@@ -369,6 +369,11 @@ class TexDateien (models.Model):
     description = models.CharField(max_length=200, blank=True)
     tex = models.TextField()
 
+
+    display_fields = ['filename',
+                      'description',
+                      'tex', ]
+
     class Meta:
         verbose_name = "Tex-Datei/allgemeines Template"
         verbose_name_plural = "Tex-Dateien/allgemeine Templates"
