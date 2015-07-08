@@ -222,7 +222,7 @@ class StudiengangModuleInline(admin.TabularInline):
     verbose_name_plural = "Module dieses Studiengangs"
 
 
-class StudiengangAdmin(admin.ModelAdmin):
+class StudiengangAdmin(OwnedAdmin):
     model = Studiengang
     fields = ['nameDe', 'nameEn',
               'url',
