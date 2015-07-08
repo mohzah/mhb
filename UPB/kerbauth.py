@@ -26,9 +26,13 @@ class KerbAuth(ModelBackend):
         
         # print "kerberos succeeded"
 
-        # TODO: enable this once we have a suitable group set up
+        # TODO: think how to better integrate this with the
+        # django permission system. depending on group
+        # membership, assign different permissions.
+        # this requires a better understanding of the
+        # way django permissions are expressed :-( 
         if False and settings.RUN_ON_WEBAPP:
-            webappgroup = dict(getent.group('webapp'))
+            webappgroup = dict(getent.group('mhb-app'))
             if username not in webappgroup['members']:
                 return None
 
