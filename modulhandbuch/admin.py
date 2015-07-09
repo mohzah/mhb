@@ -42,7 +42,7 @@ class OwnedAdmin(admin.ModelAdmin):
             return qs
 
         self.message_user(request,
-                          u"Es werden nur Einträge angezeigt, die Sie editieren dürfen!")
+                          u"EDIT wird nur bei Einträgen angezeigt, die Sie editieren dürfen!")
 
         return qs.filter(owner=request.user)
 
