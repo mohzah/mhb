@@ -160,7 +160,7 @@ class Lehreinheit(NamedEntity):
     class Meta:
         verbose_name_plural = "Lehreinheiten (typisch: Institute)"
         verbose_name = "Lehreinheit (typisch: Institut)"
-
+        ordering = ["nameDe", ]
 
 class Fachgebiet(NamedEntity):
 
@@ -173,6 +173,7 @@ class Fachgebiet(NamedEntity):
     class Meta:
         verbose_name_plural = "Fachgebiete"
         verbose_name = "Fachgebiet"
+        ordering = ["nameDe", ]
 
 
 class Pruefungsform(DescribedEntity):
@@ -181,6 +182,7 @@ class Pruefungsform(DescribedEntity):
     class Meta:
         verbose_name = u"Prüfungsform"
         verbose_name_plural = u"Prüfungsformen"
+        ordering = ["nameDe", ]
 
 
 class Organisationsform(DescribedEntity):
@@ -188,6 +190,7 @@ class Organisationsform(DescribedEntity):
     class Meta:
         verbose_name_plural = "Organisationsformen der Module"
         verbose_name = "Organisationsform des Moduls"
+        ordering = ["nameDe", ]
 
 
 class Lehrender(URLEntity):
@@ -206,6 +209,7 @@ class Lehrender(URLEntity):
     class Meta:
         verbose_name_plural = "Lehrende"
         verbose_name = "Lehrende(r)"
+        ordering = ["name", ]
 
     def __unicode__(self):
         return self.titel + ' ' + self.name
@@ -291,7 +295,7 @@ class Lehrveranstaltung(SWSEntity):
     class Meta:
         verbose_name_plural = "Lehrveranstaltungen"
         verbose_name = "Lehrveranstaltung"
-        ordering = ['nameDe']
+        ordering = ['nameDe', ]
 
 
 # class Modul(SWSEntity):
@@ -341,7 +345,7 @@ class Modul(ExaminedEntity):
     class Meta:
         verbose_name_plural = "Module"
         verbose_name = "Modul"
-        ordering = ['nameDe']
+        ordering = ['nameDe', ]
 
 
 class VeranstaltungsLps(DescribedEntity):
@@ -375,6 +379,7 @@ class FocusArea(ResponsibleEntity):
     class Meta:
         verbose_name = "Studienrichtung  (Focus Area)"
         verbose_name_plural = "Studienrichtungen  (Focus Areas)"
+        ordering = ["nameDe", ]
 
 
 class Studiengang(ResponsibleEntity):
@@ -388,6 +393,7 @@ class Studiengang(ResponsibleEntity):
     class Meta:
         verbose_name = "Studiengang"
         verbose_name_plural = u"Studiengänge"
+        ordering = ["nameDe", ]
 
 
 class TexDateien (models.Model):
@@ -396,7 +402,6 @@ class TexDateien (models.Model):
     description = models.CharField(max_length=200, blank=True)
     tex = models.TextField()
 
-
     display_fields = ['filename',
                       'description',
                       'tex', ]
@@ -404,6 +409,7 @@ class TexDateien (models.Model):
     class Meta:
         verbose_name = "Tex-Datei/allgemeines Template"
         verbose_name_plural = "Tex-Dateien/allgemeine Templates"
+        ordering = ["filename", ]
 
     def is_start_file(self):
         """check whether the tex code contains
