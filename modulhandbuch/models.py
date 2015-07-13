@@ -179,7 +179,7 @@ class Fachgebiet(NamedEntity):
                                blank=True,
                                verbose_name=u"Kürzel",
                                help_text=u"Kürzel des Fachgebiets")
-    display_fields = ['nameDe', 'nameEn', 'kuerzel', 'url']
+    display_fields = ['nameDe', 'nameEn', 'kuerzel', 'url', 'editors']
 
     class Meta:
         verbose_name_plural = "Fachgebiete"
@@ -188,7 +188,7 @@ class Fachgebiet(NamedEntity):
 
 
 class Pruefungsform(DescribedEntity):
-    display_fields = ['nameDe', 'nameEn', 'beschreibungDe', 'beschreibungEn']
+    display_fields = ['nameDe', 'nameEn', 'beschreibungDe', 'beschreibungEn', 'editors']
 
     class Meta:
         verbose_name = u"Prüfungsform"
@@ -197,7 +197,7 @@ class Pruefungsform(DescribedEntity):
 
 
 class Organisationsform(DescribedEntity):
-    display_fields = ['nameDe', 'nameEn', 'beschreibungDe', 'beschreibungEn']
+    display_fields = ['nameDe', 'nameEn', 'beschreibungDe', 'beschreibungEn', 'editors']
     class Meta:
         verbose_name_plural = "Organisationsformen der Module"
         verbose_name = "Organisationsform des Moduls"
@@ -205,7 +205,7 @@ class Organisationsform(DescribedEntity):
 
 
 class Lehrender(URLEntity):
-    display_fields = ['name', 'titel', 'url', 'fachgebiet', 'lehreinheit']
+    display_fields = ['name', 'titel', 'url', 'fachgebiet', 'lehreinheit', 'editors']
 
     name = models.CharField(max_length=200,
                             help_text="Vor- und Nachname")
@@ -239,6 +239,7 @@ class Lehrveranstaltung(SWSEntity):
                       'methodikDe', 'methodikEn',
                       'vorkenntnisseDe', 'vorkenntnisseEn',
                       'materialDe', 'materialEn',
+                      'editors'
                   ]
 
     termin = models.CharField(max_length=2,
@@ -320,6 +321,7 @@ class Modul(ExaminedEntity):
                       'organisation',
                       'lernzieleDe', 'lernzieleEn',
                       'bemerkungDe', 'bemerkungEn',
+                      'editors'
                   ]
     lps = models.IntegerField(default=0,
                               help_text=
@@ -383,7 +385,7 @@ class FocusArea(ResponsibleEntity):
         'nameDe', 'nameEn',
         'url',
         'verantwortlicher',
-        'beschreibungDe', 'beschreibungEn']
+        'beschreibungDe', 'beschreibungEn', 'editors']
 
     module = models.ManyToManyField(Modul)
 
