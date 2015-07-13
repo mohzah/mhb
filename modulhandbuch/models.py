@@ -385,6 +385,7 @@ class FocusArea(ResponsibleEntity):
         'nameDe', 'nameEn',
         'url',
         'verantwortlicher',
+        'module', 
         'beschreibungDe', 'beschreibungEn', 'editors']
 
     module = models.ManyToManyField(Modul)
@@ -396,6 +397,16 @@ class FocusArea(ResponsibleEntity):
 
 
 class Studiengang(ResponsibleEntity):
+
+    display_fields = [
+        'nameDe', 'nameEn',
+        'url',
+        'verantwortlicher',
+        'module',
+        'focusareas',
+        'startdateien',
+        'beschreibungDe', 'beschreibungEn', 'editors']
+
     module = models.ManyToManyField(Modul)
     focusareas = models.ManyToManyField(FocusArea)
     startdateien = models.ManyToManyField("TexDateien",
