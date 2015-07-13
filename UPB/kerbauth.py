@@ -23,14 +23,14 @@ class KerbAuth(ModelBackend):
         except kerberos.BasicAuthError:
             # print "Kerberos auth failed"
             return None
-        
+
         # print "kerberos succeeded"
 
         # TODO: think how to better integrate this with the
         # django permission system. depending on group
         # membership, assign different permissions.
         # this requires a better understanding of the
-        # way django permissions are expressed :-( 
+        # way django permissions are expressed :-(
         if False and settings.RUN_ON_WEBAPP:
             webappgroup = dict(getent.group('mhb-app'))
             if username not in webappgroup['members']:
@@ -51,13 +51,23 @@ class KerbAuth(ModelBackend):
 
             # we do not make anybody superuser here;
             # that should happen manually
-            
+
             try:
                 # have to set a reasonable default group
                 g = Group.objects.get(name="lehrender")
                 user.groups.add(g)
             except:
                 # print "adding user to group did not work"
+                pass
+
+            # try to get the real-world user name :
+            try:
+                d = dict(getent.passwd(username))
+                gecos = d['gecos']
+                f, l = gecos.split(' ', 1)
+                user.first_name = f
+                user.last_name = l
+            except:
                 pass
 
             user.save()
