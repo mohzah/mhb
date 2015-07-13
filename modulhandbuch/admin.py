@@ -92,6 +92,7 @@ class OwnedAdmin(admin.ModelAdmin):
 
         if (obj
             and not (obj.owner == request.user)
+            and not (request.user in obj.editors.all())
             and not request.user.is_superuser):
             # print "setting fields readonly"
             # then add further read-only fields, actually, all of them
