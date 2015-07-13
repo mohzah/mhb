@@ -273,9 +273,9 @@ class Lehrveranstaltung(SWSEntity):
     # kombinationDe = models.TextField(blank=True)
     # kombinationEn = models.TextField(blank=True)
     materialDe = models.TextField(blank=True,
-                                  help_text="Materialien für die Vorlesung")
+                                  help_text=u"Materialien für die Vorlesung")
     materialEn = models.TextField(blank=True,
-                                  help_text="Materialien für die Vorlesung (englische Beschreibung)")
+                                  help_text=u"Materialien für die Vorlesung (englische Beschreibung)")
 
     def in_modul(self, modul):
         """A little helper function: check if this
@@ -411,7 +411,7 @@ class Studiengang(ResponsibleEntity):
     focusareas = models.ManyToManyField(FocusArea)
     startdateien = models.ManyToManyField("TexDateien",
                                           verbose_name="Benutzte Dateien",
-                                          help_text="Welche Tex-Dateien werden für dieesen Studiengang benötigt?")
+                                          help_text=u"Welche Tex-Dateien werden für dieesen Studiengang benötigt?")
     # TODO: de, en , both Versionen der Startdateien?
 
     class Meta:
