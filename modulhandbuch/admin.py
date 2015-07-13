@@ -259,6 +259,8 @@ class StudiengangModuleInline(admin.TabularInline):
 
 class StudiengangAdmin(OwnedAdmin):
     model = Studiengang
+    form = select2_modelform(Studiengang, attrs={'width': '250px'})
+    
     fields = ['nameDe', 'nameEn',
               'url',
               'beschreibungDe', 'beschreibungEn',
@@ -272,25 +274,34 @@ class StudiengangAdmin(OwnedAdmin):
 
 class LehrenderAdmin(OwnedAdmin):
     model = Lehrender
+    form = select2_modelform(Lehrender, attrs={'width': '250px'})
+
 
 class FachgebietAdmin(OwnedAdmin):
     model = Fachgebiet
+    form = select2_modelform(Fachgebiet, attrs={'width': '250px'})
 
 
 class LehreinheitAdmin(OwnedAdmin):
     model = Lehreinheit
+    form = select2_modelform(Lehreinheit, attrs={'width': '250px'})
 
 
 class PruefungsformAdmin(OwnedAdmin):
     model = Pruefungsform
+    form = select2_modelform(Pruefungsform, attrs={'width': '250px'})
 
 
 class OrganisationsformAdmin(OwnedAdmin):
     model = Organisationsform
+    form = select2_modelform(Organisationsform, attrs={'width': '250px'})
 
 
 class LehrveranstaltungAdmin(OwnedAdmin):
     model = Lehrveranstaltung
+    form = select2_modelform(Lehrveranstaltung, attrs={'width': '250px'})
+
+####################
 
 admin.site.register(Lehreinheit, LehreinheitAdmin)
 admin.site.register(Fachgebiet, FachgebietAdmin)
