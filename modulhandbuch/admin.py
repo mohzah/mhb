@@ -24,7 +24,7 @@ class OwnedAdmin(admin.ModelAdmin):
 
         # construct the field names to show:
         tmp = [f.name for f in self.model._meta.fields]
-        print "admin: ", self.__class__, tmp
+        # print "admin: ", self.__class__, tmp
         try:
             tmp.remove('id')
             tmp.remove('owner')
@@ -45,7 +45,7 @@ class OwnedAdmin(admin.ModelAdmin):
         
         qs = super(OwnedAdmin, self).get_queryset(request)
 
-        print "admin get_qs: ", qs
+        # print "admin get_qs: ", qs
         
         if request.user.is_superuser:
             return qs
@@ -57,7 +57,7 @@ class OwnedAdmin(admin.ModelAdmin):
                          Q(editors__in = [request.user])
                          ).distinct()
 
-        print "admin get_qs 2: ", qs
+        # print "admin get_qs 2: ", qs
         
         return qs
     
@@ -76,7 +76,7 @@ class OwnedAdmin(admin.ModelAdmin):
     # es fehlt hier noch die has_change_permission!
 
     def has_delete_permission(self, request, obj=None):
-        print "has delete: ", obj, request.user, request.user.is_superuser
+        # print "has delete: ", obj, request.user, request.user.is_superuser
         if obj:
             if ((request.user.is_superuser) or
                 (obj.owner == request.user)):
@@ -85,15 +85,15 @@ class OwnedAdmin(admin.ModelAdmin):
         return False
 
     def get_readonly_fields(self, request, obj=None):
-        print "grof: ", request, request.user, obj, obj.owner if obj else "N/A"
+        # print "grof: ", request, request.user, obj, obj.owner if obj else "N/A"
 
         tmp = self.readonly_fields
-        print "readonly: ", tmp
+        # print "readonly: ", tmp
 
         if (obj
             and not (obj.owner == request.user)
             and not request.user.is_superuser):
-            print "setting fields readonly"
+            # print "setting fields readonly"
             # then add further read-only fields, actually, all of them
             # tmp = tmp + self.not_owner_readonly_fields
             tmp = list(tmp) + [f.name for f in self.model._meta.fields]
@@ -103,7 +103,7 @@ class OwnedAdmin(admin.ModelAdmin):
                               u"Sie dürfen diesen Eintrag nicht editieren!",
                               )
 
-        print "readonly_fields: ", tmp
+        # print "readonly_fields: ", tmp
         return tmp
 
     # attempt to get the inlines as read-only as well:

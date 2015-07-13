@@ -54,7 +54,7 @@ class SimpleListView(ListView):
                             if self.title
                             else self.model._meta.verbose_name_plural)
 
-        print context
+        # print context
         return context
 
 
@@ -267,7 +267,7 @@ class GenerierenAuswahl(TemplateView):
     template_name = "generieren.html"
 
     def get_context_data(self, **kwargs):
-        print "in contetx data von GenerierenAuswahl"
+        # print "in contetx data von GenerierenAuswahl"
         context = super(GenerierenAuswahl, self).get_context_data(**kwargs)
 
         context['files'] = [
@@ -276,7 +276,7 @@ class GenerierenAuswahl(TemplateView):
                   # if tex.is_start_file()
               ], )
             for sg in models.Studiengang.objects.all()]
-        print context['files']
+        # print context['files']
 
         return context
 
@@ -452,8 +452,8 @@ class Generieren(TemplateView):
             tmp,
         )
 
-        print "destDir: ", destDir
-        print "archieve name: ", archivename
+        # print "destDir: ", destDir
+        # print "archieve name: ", archivename
 
         archive = shutil.make_archive(
             base_name=archivename,
@@ -468,7 +468,7 @@ class Generieren(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        print "in generieren view", kwargs
+        # print "in generieren view", kwargs
 
         globalerror = []
 
@@ -485,7 +485,7 @@ class Generieren(TemplateView):
             studiengang = kwargs['sg']
             sgObj = models.Studiengang.objects.get(pk=int(studiengang))
         except Exception as e:
-            print e
+            # print e
             globalerror += ["Studiengang nicht gefunden"]
             
         if globalerror:
