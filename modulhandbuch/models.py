@@ -30,7 +30,7 @@ class OwnedEntity(models.Model):
         """Every super user can edit,
         and the owner"""
 
-        print "can_edit: ", self, self.editors.all(), user
+        # print "can_edit: ", self, self.editors.all(), user
         
         return (user.is_superuser or
                 user == self.owner or
