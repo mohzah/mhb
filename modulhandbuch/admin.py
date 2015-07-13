@@ -13,6 +13,20 @@ import re
 # Option with easy_select2:
 from easy_select2 import select2_modelform
 
+############
+
+
+def user_unicode(self):
+    return  u'%s (%s, %s)' % (self.username, self.last_name, self.first_name)
+
+User.__unicode__ = user_unicode
+
+admin.site.unregister(User)
+admin.site.register(User)
+
+##############
+
+
 ## a basic admin to add ownership
 
 class OwnedAdmin(admin.ModelAdmin):
@@ -209,21 +223,26 @@ class ModulLVInline(OwnedInline):
 class ModulAdmin(OwnedAdmin):
     form = ModulForm
     inlines = [ModulLVInline]
+    form = select2_modelform(Modul, attrs={'width': '250px'})
 
     pass
 
 
 class FocusAreaModulInline(admin.TabularInline):
+
     model = FocusArea.module.through
 
 
-class FocusAreaAdmin(admin.ModelAdmin):
+class FocusAreaAdmin(OwnedAdmin):
     # inlines = [FocusAreaModulInline]
+    
     form = select2_modelform(FocusArea, attrs={'width': '250px'})
-    fields = [ 'url', 'nameDe', 'nameEn',
-               'module',
-               'beschreibungDe', 'beschreibungEn',
-               'verantwortlicher']
+
+    # fields = [ 'url', 'nameDe', 'nameEn',
+    #            'module',
+    #            'beschreibungDe', 'beschreibungEn',
+    #            'verantwortlicher',
+    #            'editors']
     pass
 
 
@@ -253,7 +272,6 @@ class StudiengangAdmin(OwnedAdmin):
 
 class LehrenderAdmin(OwnedAdmin):
     model = Lehrender
-
 
 class FachgebietAdmin(OwnedAdmin):
     model = Fachgebiet

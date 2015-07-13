@@ -25,7 +25,7 @@ class OwnedEntity(models.Model):
                                      help_text=u"Wer darf (ausser dem Eigentümer) diesen Eintrag editieren?",
                                      blank=True,
     )
-    
+
     def can_edit(self, user):
         """Every super user can edit,
         and the owner"""
