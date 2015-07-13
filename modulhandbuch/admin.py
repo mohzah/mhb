@@ -4,6 +4,7 @@
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
 from modulhandbuch.models import *
 
@@ -23,6 +24,7 @@ class OwnedAdmin(admin.ModelAdmin):
 
         # construct the field names to show:
         tmp = [f.name for f in self.model._meta.fields]
+        print "admin: ", self.__class__, tmp
         try:
             tmp.remove('id')
             tmp.remove('owner')
@@ -32,20 +34,33 @@ class OwnedAdmin(admin.ModelAdmin):
             # not all fields might be in all modules,
             # but that is not a problem
             pass
-        self.fields = tmp
+        self.fields = tmp + ['editors', ]
 
         return res
 
     def get_queryset(self, request):
+        """Get objects that the logged-in user is allowed to edit. 
+        Could be as owner, superuser, or by being part of editors
+        """
+        
         qs = super(OwnedAdmin, self).get_queryset(request)
+
+        print "admin get_qs: ", qs
+        
         if request.user.is_superuser:
             return qs
 
         self.message_user(request,
                           u"EDIT wird nur bei Einträgen angezeigt, die Sie editieren dürfen!")
 
-        return qs.filter(owner=request.user)
+        qs = qs.filter(Q(owner=request.user) |
+                         Q(editors__in = [request.user])
+                         ).distinct()
 
+        print "admin get_qs 2: ", qs
+        
+        return qs
+    
     def save_model(self, request, obj, form, change):
         # print "--------------"
         # print "in save_model: ", obj, obj.owner, change, request.user

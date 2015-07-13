@@ -19,12 +19,23 @@ class OwnedEntity(models.Model):
                               blank=True,
                               null=True)
 
+    editors = models.ManyToManyField(User,
+                                     related_name="%(app_label)s_%(class)s_editors",
+                                     verbose_name=u"Editierrechte",
+                                     help_text=u"Wer darf (ausser dem Eigentümer) diesen Eintrag editieren?",
+                                     blank=True,
+    )
+    
     def can_edit(self, user):
         """Every super user can edit,
         and the owner"""
 
+        print "can_edit: ", self, self.editors.all(), user
+        
         return (user.is_superuser or
-                user == self.owner)
+                user == self.owner or
+                user in self.editors.all()
+                )
 
     class Meta:
         abstract = True
@@ -155,7 +166,7 @@ class SWSEntity(ResponsibleEntity):
 # disaply_fields is an attribute picked up by the simple display views
 
 class Lehreinheit(NamedEntity):
-    display_fields = ['nameDe', 'nameEn', 'url']
+    display_fields = ['nameDe', 'nameEn', 'url', 'editors']
 
     class Meta:
         verbose_name_plural = "Lehreinheiten (typisch: Institute)"
