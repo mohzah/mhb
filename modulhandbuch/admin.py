@@ -300,7 +300,7 @@ class OrganisationsformAdmin(OwnedAdmin):
 class LehrveranstaltungAdmin(OwnedAdmin):
     model = Lehrveranstaltung
     form = select2_modelform(Lehrveranstaltung, attrs={'width': '250px'})
-
+ 
 ####################
 
 admin.site.register(Lehreinheit, LehreinheitAdmin)
