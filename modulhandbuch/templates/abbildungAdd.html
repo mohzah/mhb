@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title  %}
+    Modulhandbuch
+{% endblock %}
+{% block breadcrumb %}
+    <li><a href="/">Home</a></li>
+    <li><a href="{% url 'mhbhome' %}">Modulhandbuch</a></li>
+    <li><a href="{% url 'modulhandbuchansehen' %}">Ansehen</a></li>
+    <li><a href="{% url 'abbildungenList' %}">Abbildungen</a> </li>
+    <li class="active">Hinzufügen </li>
+{% endblock %}
+
+
+    {% block content %}
+    <h2> Abbildung hinzufügen </h2>
+
+    <form enctype="multipart/form-data" action="" method="post">{% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Hinzufügen" />
+    </form>    
+    {% endblock %}

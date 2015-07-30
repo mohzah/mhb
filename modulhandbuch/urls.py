@@ -143,5 +143,13 @@ urlpatterns = [
         active_and_login_required(views.TexDateienDetailView.as_view()),
         name="texdateienDetail"),
 
+    url(r'/abbildung$',
+        active_and_login_required(views.AbbildungenView.as_view()),
+        name="abbildungenList"),
+
+    url(r'/abbildungAdd$',
+        active_and_login_required(views.AbbildungenAddView.as_view()),
+        name="abbildungAdd"),  
+    
 ]
 

@@ -3,13 +3,14 @@
 from django.shortcuts import render
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
+from django.core.urlresolvers import reverse
 
-from django.views.generic import View, TemplateView, ListView, DetailView
+from django.views.generic import View, TemplateView, FormView, ListView, DetailView
 
 import django.db.models.fields.related as fieldsRelated
 
 import models
-
+import forms
 import tempfile
 
 import jinja2
@@ -559,3 +560,39 @@ class Generieren(TemplateView):
         context['archivepath'] = archivepath
 
         return context
+
+class AbbildungenView(ListView):
+    """Display a list of figures from a directory. 
+    Allow delete, add new one. No database storage.
+    """
+
+    template_name = "abbildungen.html"
+
+    def get_queryset(self):
+        r = os.listdir(os.path.join(settings.MEDIA_ROOT,
+                                       'figures',)
+                      )
+        return r
+
+class AbbildungenAddView(FormView):
+
+    form_class = forms.UploadAbbildung
+    template_name = "abbildungAdd.html"
+    # TODO: check why reversing hte URL does not work
+    # success_url = reverse_lazy("abbildungenList")
+    success_url = "modulhandbuch/abbildung"
+
+    def form_valid(self, form):
+        f = self.request.FILES['file']
+
+        # write the file to disk:
+        with open(os.path.join(settings.MEDIA_ROOT,
+                               'figures',
+                               f.name),
+                  'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
+        
+        return super(AbbildungenAddView, self).form_valid(form)
+
+
