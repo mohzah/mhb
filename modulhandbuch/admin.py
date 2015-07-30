@@ -41,7 +41,7 @@ class OwnedAdmin(admin.ModelAdmin):
         # print "admin: ", self.__class__, tmp
         try:
             tmp.remove('id')
-            tmp.remove('owner')
+            # tmp.remove('owner')
             tmp.remove('namedentity_ptr')
             tmp.remove('slug')
         except:
