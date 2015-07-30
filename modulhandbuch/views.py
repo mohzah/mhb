@@ -419,6 +419,12 @@ class Generieren(TemplateView):
                              ': something went wrong; generic exception - ' +
                              str(e))
 
+        os.symlink(os.path.join(settings.MEDIA_ROOT,
+                                'figures'),
+                   os.path.join(tmpdir,
+                                'figures'))
+
+        
         return error
 
     def generatePdf(self, tmpdir, destDir, startdateien):
