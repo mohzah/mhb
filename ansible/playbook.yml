@@ -44,6 +44,8 @@
     #   cron: name="backup webapps" hour="3" minute="10" user={{ user }} state=present job="cp the sqlite database to isilon >> {{ ansible_env.HOME }}/logs/backup.log  2>&1"
 
 
+
+# TODO: make sure that we create media, media/figures, and put a symblink to media figures in the right place! 
     
 # depending on the way the application runs (apache? stand-alone? nginx?)
 # we need additional actions to integrate the  application server into the web server
