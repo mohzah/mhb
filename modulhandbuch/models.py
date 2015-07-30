@@ -31,7 +31,7 @@ class OwnedEntity(models.Model):
         and the owner"""
 
         # print "can_edit: ", self, self.editors.all(), user
-        
+
         return (user.is_superuser or
                 user == self.owner or
                 user in self.editors.all()
@@ -243,6 +243,7 @@ class Lehrveranstaltung(SWSEntity):
                   ]
 
     termin = models.CharField(max_length=2,
+                              verbose_name="Termin",
                               choices=(('WS', 'Wintersemester'),
                                        ('SS', 'Sommersemester'),
                                        ('NA', 'Nicht bekannt'), ),
@@ -254,27 +255,38 @@ class Lehrveranstaltung(SWSEntity):
     # kurzbeschreibungDe = models.TextField(blank=True)
     # kurzbeschreibungEn = models.TextField(blank=True)
     inhaltDe = models.TextField(blank=True,
+                                verbose_name="Inhalt",
                                 help_text="Stichpunkte zu Inhalten, wesentliche Kapitel")
-    inhaltEn = models.TextField(blank=True)
+    inhaltEn = models.TextField(blank=True,
+                                verbose_name="Inhalt (engl.)",
+    )
     lernergebnisDe = models.TextField(blank=True,
+                                      verbose_name="Lernergebnis",
                                       help_text=
                                       "Kompetenzorientierte Beschreibung")
     lernergebnisEn = models.TextField(blank=True,
+                                      verbose_name="Lernergebnis (engl.)",
                                       help_text=
                                       "Kompetenzorientierte Beschreibung (engl.)")
     methodikDe = models.TextField(blank=True,
+                                  verbose_name="Methodik",
                                   help_text="Beschreibung der Lehrmethoden")
     methodikEn = models.TextField(blank=True,
+                                  verbose_name="Methodik (engl.)",
                                   help_text="Beschreibung der Lehrmethoden (engl.)")
     vorkenntnisseDe = models.TextField(blank=True,
+                                       verbose_name="Vorkenntnisse",
                                        help_text="Sinnvolle Vorkenntnisse")
     vorkenntnisseEn = models.TextField(blank=True,
+                                       verbose_name="Vorkenntnisse (engl.)",
                                        help_text="Sinnvolle Vorkenntnisse (engl.)")
     # kombinationDe = models.TextField(blank=True)
     # kombinationEn = models.TextField(blank=True)
     materialDe = models.TextField(blank=True,
+                                  verbose_name="Material",
                                   help_text=u"Materialien für die Vorlesung")
     materialEn = models.TextField(blank=True,
+                                  verbose_name="Material (engl.)",
                                   help_text=u"Materialien für die Vorlesung (englische Beschreibung)")
 
     def in_modul(self, modul):
@@ -324,23 +336,29 @@ class Modul(ExaminedEntity):
                       'editors'
                   ]
     lps = models.IntegerField(default=0,
+                              verbose_name="Leistungspunkte",
                               help_text=
                               u"Anzahl Leistungspunkte.")
 
     organisation = models.ForeignKey(Organisationsform,
+                                     verbose_name="Organisationsform des Moduls",
                                      help_text=u"Art der Durchführung des Moduls")
 
     lernzieleDe = models.TextField(blank=True,
+                                   verbose_name="Lernziele",
                                    help_text=
                                    "Kurzbeschreibung der erworbenen Fertigkeiten, kompetenzorientiert.")
     lernzieleEn = models.TextField(blank=True,
+                                   verbose_name="Lernziele (engl.)",
                                    help_text=
                                    "Kurzbeschreibung der erworbenen Fertigkeiten, kompetenzorientiert (engl.).")
 
     bemerkungDe = models.TextField(blank=True,
+                                   verbose_name="Bemerkungen",
                                    help_text=
                                    "Sonstige Bemerkungen")
     bemerkungEn = models.TextField(blank=True,
+                                   verbose_name="Bemerkungen (engl.)",
                                    help_text=
                                    "Sonstige Bemerkungen (engl.)")
 
@@ -349,6 +367,7 @@ class Modul(ExaminedEntity):
                                   "Ist das eine Pflichtmodul?")
 
     anzahlLvs = models.IntegerField(default=0,
+                                    verbose_name="Anzahl Lehrveranstaltungen",
                                     help_text=u"Wie viele Lehrveranstaltungen müssen in diesem Modul belegt werden in diesem Modul? Zur Berechung des Arbeitsaufwandes notwendig.")
 
     # TODO: If it stays a responsible entity, then we need methods
@@ -364,6 +383,7 @@ class Modul(ExaminedEntity):
 class VeranstaltungsLps(DescribedEntity):
 
     lp = models.IntegerField(default=0,
+                             verbose_name="Leistungspunkte",
                              help_text=
                              u"Anzahl LPs für diese Lehrveranstaltung in diesem Modul")
     veranstaltung = models.ForeignKey(Lehrveranstaltung)
@@ -385,7 +405,7 @@ class FocusArea(ResponsibleEntity):
         'nameDe', 'nameEn',
         'url',
         'verantwortlicher',
-        'module', 
+        'module',
         'beschreibungDe', 'beschreibungEn', 'editors']
 
     module = models.ManyToManyField(Modul)
