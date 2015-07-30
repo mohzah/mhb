@@ -480,7 +480,9 @@ class Generieren(TemplateView):
         )
 
         # TODO: make the URL to the archiv more meaningful
-        archivepath = (settings.MEDIA_URL + "modulhandbuch/archiv.zip")
+        archivepath = (settings.MEDIA_URL+
+                       "modulhandbuch/" + 
+                       tmp+".zip")
 
         return (pdfs, archivepath, error)
 
