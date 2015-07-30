@@ -6,6 +6,8 @@ from django.core.exceptions import FieldDoesNotExist
 
 from django.views.generic import View, TemplateView, ListView, DetailView
 
+import django.db.models.fields.related as fieldsRelated
+
 import models
 
 import tempfile
@@ -147,18 +149,27 @@ class SimpleDetailView(DetailView):
         for  f in self.display_fields:
             try:
                 vn = self.model._meta.get_field(f).verbose_name
+                thisfield = self.model._meta.get_field(f)
             except FieldDoesNotExist:
                 continue
 
             helptext = self.model._meta.get_field(f).help_text
 
-            # getting the value is a bit more complex:
-            at = getattr(self.object, f)
+            # let's get the value of this field.
+            # We need to be mindful of many-to-many fields here,
+            # as getattr seems to return a manager object here?
+
 
             try:
-                val = at.__unicode__()
-            except:
-                val = at
+                val = None
+                if isinstance(thisfield, fieldsRelated.ManyToManyField):
+                    val = ', '.join([x.__unicode__() for x in  getattr(self.object, f).all()])
+                else:
+                    # print "ordinary field"
+                    val = getattr(self.object, f)
+            except Exception as e:
+                print e
+                val = ""
 
             if ( (val is None) or
                  (val == "")):
@@ -235,7 +246,7 @@ class FocusAreaDetailView(SimpleDetailView):
 
         return context
 
-    
+
 class StudiengangDetailView(SimpleDetailView):
     model = models.Studiengang
     # TODO: list foriegn keys
@@ -318,7 +329,7 @@ class Generieren(TemplateView):
                           studiengang, startdatei,
                           ):
         """Take a list of texdatei objects and turn them
-        into a tex file in the file system. 
+        into a tex file in the file system.
         Only hit the database once
         """
 
@@ -330,9 +341,9 @@ class Generieren(TemplateView):
             trim_blocks=True,
             lstrip_blocks=True,
         )
-        
+
         ######################
-        # Databae retrieval: 
+        # Databae retrieval:
         # pass in all the generic data, not related to
         # the concrete studiengang
         _lehreinheiten = models.Lehreinheit.objects.all()
@@ -346,9 +357,9 @@ class Generieren(TemplateView):
         # those objects into the rendered that actually pertain to the
         # desired studiengang
         # (the "all" versions are just to ease testing)
-        
+
         _module = models.Modul.objects.filter(studiengang__id=studiengang.id)
-        
+
         _focusareas=models.FocusArea.objects.filter(studiengang__id=studiengang.id)
 
         # more complicated for the lehrveranstaltungen,
@@ -463,7 +474,7 @@ class Generieren(TemplateView):
 
         # TODO: make the URL to the archiv more meaningful
         archivepath = (settings.MEDIA_URL + "modulhandbuch/archiv.zip")
-        
+
         return (pdfs, archivepath, error)
 
     def get_context_data(self, **kwargs):
@@ -487,19 +498,19 @@ class Generieren(TemplateView):
         except Exception as e:
             # print e
             globalerror += ["Studiengang nicht gefunden"]
-            
+
         if globalerror:
             context['globalerror'] = globalerror
             return context
-            
+
         try:
             texdatei = kwargs['td']
             startdateien = models.TexDateien.objects.filter(pk=int(texdatei))
         except Exception as e:
             # this is not necessarily an error; means the user
-            # wants to run on all the startdatei of 
+            # wants to run on all the startdatei of
             startdateien = sgObj.startdateien.all()
-            
+
 
         #######
         # we found all input data
@@ -521,7 +532,7 @@ class Generieren(TemplateView):
         # on ALL Texdateien. Not the most efficient thing to do,
         # but much easier than trying to figure out with
         # files are inlined by the startdateien
-            
+
         globalerror += self.renderTexdateiObj(
             tmpdir,
             models.TexDateien.objects.all(),
@@ -540,11 +551,11 @@ class Generieren(TemplateView):
         # delete temp directoy and content
         shutil.rmtree(tmpdir, ignore_errors=True)
 
-        # collect all the results in context and return 
+        # collect all the results in context and return
         context['globalerror'] = globalerror
         context['pdfs'] = pdfs
         context['tdObj'] = startdateien
         context['sgObj'] = sgObj
         context['archivepath'] = archivepath
-        
+
         return context
