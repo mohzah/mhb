@@ -7,6 +7,7 @@ from django.utils import translation
 from django.conf import settings
 
 from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
 
 import getent
 
@@ -39,12 +40,13 @@ class Command(BaseCommand):
                 # we do not make anybody superuser here;
                 # that should happen manually
 
+                # user.save()
                 try:
                     # have to set a reasonable default group
                     g = Group.objects.get(name="lehrender")
                     user.groups.add(g)
                 except:
-                    # print "adding user to group did not work"
+                    print "adding user to group did not work"
                     pass
 
                 # try to get the real-world user name :
