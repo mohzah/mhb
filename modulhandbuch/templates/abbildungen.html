@@ -20,7 +20,9 @@
         <h3> Liste vorhandener Abbildungen: </h3>
         <ul>
         {% for o in object_list %}
-            <li> <a href="/media/figures/{{ o }}">{{ o }}</a> </li>
+            <li> <a href="/media/figures/{{ o }}">{{ o }}</a>
+                <img src="/media/figures/{{ o }}" class="img-thumbnail" width="304" height="236">
+            </li>
         {% endfor %}
         </ul>
     </p>
