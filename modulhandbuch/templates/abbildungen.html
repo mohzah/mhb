@@ -26,6 +26,10 @@
         {% for o in object_list %}
             <li> <a href="/media/figures/{{ o.0 }}">{{ o.0 }}</a>
                 <img src="/media/figures/{{ o.1 }}" class="img-thumbnail" width="304" height="236">
+                <a class="btn btn-danger" href="{% url 'abbildungDelete' filename=o.0  %}">
+                    <span class="glyphicon glyphicon-trash"></span>
+                    Löschen
+                </a>
             </li>
         {% endfor %}
         </ul>

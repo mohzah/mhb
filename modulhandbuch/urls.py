@@ -151,5 +151,8 @@ urlpatterns = [
         active_and_login_required(views.AbbildungenAddView.as_view()),
         name="abbildungAdd"),  
     
+    url(r'/abbildungDelete/(?P<filename>.+)$',
+        active_and_login_required(views.AbbildungenDeleteView.as_view()),
+        name="abbildungDelete"),  
 ]
 

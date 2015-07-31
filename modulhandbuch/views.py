@@ -7,6 +7,8 @@ from django.core.urlresolvers import reverse
 
 from django.views.generic import View, TemplateView, FormView, ListView, DetailView
 
+from django.shortcuts import redirect
+
 import django.db.models.fields.related as fieldsRelated
 
 import models
@@ -633,3 +635,18 @@ class AbbildungenAddView(FormView):
                 pass
 
         return super(AbbildungenAddView, self).form_valid(form)
+
+class AbbildungenDeleteView(View):
+    """Simple, direct delete. Change this to a confirmation dialog"""
+
+    def get(self, request, filename):
+        """delete filename in media root, figures"""
+        fullfilename = os.path.join(
+            settings.MEDIA_ROOT,
+            'figures',
+            filename
+        )
+
+        os.remove(fullfilename)
+        
+        return redirect("modulhandbuch/abbildung")
