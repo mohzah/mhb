@@ -14,10 +14,10 @@
     {% block content %}
     <h2> Abbildungen </h2>
 
-    <a href="{% url 'abbildungAdd' %}"> Hinzufügen</a>
-
+    <a href="{% url 'abbildungAdd' %}"  class="btn btn-info"><span class="glyphicon glyphicon-plus"></span>  Hinzufügen</a>
     <p>
 
+        <h3> Liste vorhandener Abbildungen: </h3>
         <ul>
         {% for o in object_list %}
             <li> <a href="/media/figures/{{ o }}">{{ o }}</a> </li>
