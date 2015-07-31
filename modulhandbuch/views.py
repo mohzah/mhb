@@ -424,7 +424,7 @@ class Generieren(TemplateView):
                    os.path.join(tmpdir,
                                 'figures'))
 
-        
+
         return error
 
     def generatePdf(self, tmpdir, destDir, startdateien):
@@ -481,7 +481,7 @@ class Generieren(TemplateView):
 
         # TODO: make the URL to the archiv more meaningful
         archivepath = (settings.MEDIA_URL+
-                       "modulhandbuch/" + 
+                       "modulhandbuch/" +
                        tmp+".zip")
 
         return (pdfs, archivepath, error)
@@ -570,7 +570,7 @@ class Generieren(TemplateView):
         return context
 
 class AbbildungenView(ListView):
-    """Display a list of figures from a directory. 
+    """Display a list of figures from a directory.
     Allow delete, add new one. No database storage.
     """
 
@@ -580,6 +580,17 @@ class AbbildungenView(ListView):
         r = os.listdir(os.path.join(settings.MEDIA_ROOT,
                                        'figures',)
                       )
+        # filter out the thumbnails
+        r = [x
+             for x in r
+             if not x.endswith("-thumbnail.png")]
+        
+        # provide separate entries for the file itself and a thumbnail
+        r = [ (x,
+               x[:-4] + "-thumbnail.png" if x.endswith('.pdf') else x)
+              for x in r
+          ] 
+        
         return r
 
 class AbbildungenAddView(FormView):
@@ -594,13 +605,31 @@ class AbbildungenAddView(FormView):
         f = self.request.FILES['file']
 
         # write the file to disk:
-        with open(os.path.join(settings.MEDIA_ROOT,
-                               'figures',
-                               f.name),
+        destname = os.path.join(settings.MEDIA_ROOT,
+                                'figures',
+                                f.name)
+        with open(destname,
                   'wb+') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
-        
+
+        # should we convert a PDF to a bitmap for previews?
+        if f.name.endswith('.pdf'):
+            thumbname = os.path.join(
+                settings.MEDIA_ROOT,
+                'figures',
+                f.name[:-4] + "-thumbnail.png")
+
+            # call convert
+            try:
+                r = subprocess.check_output(
+                    ['convert',
+                     destname,
+                     thumbname],
+                    stderr=subprocess.STDOUT,
+                )
+            except subprocess.CalledProcessError as e:
+                print "convert failed: ", e
+                pass
+
         return super(AbbildungenAddView, self).form_valid(form)
-
-
