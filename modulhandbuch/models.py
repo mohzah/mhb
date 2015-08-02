@@ -26,6 +26,8 @@ class OwnedEntity(models.Model):
                                      blank=True,
     )
 
+    admin_fields = []
+    
     def can_edit(self, user):
         """Every super user can edit,
         and the owner"""
@@ -250,9 +252,12 @@ class Lehrveranstaltung(SWSEntity):
                       'methodikDe', 'methodikEn',
                       'vorkenntnisseDe', 'vorkenntnisseEn',
                       'materialDe', 'materialEn',
+                      'nfk',
                       'editors'
                   ]
 
+    admin_fields = ["nfk"]
+    
     termin = models.CharField(max_length=2,
                               verbose_name="Termin",
                               choices=(('WS', 'Wintersemester'),
@@ -300,6 +305,13 @@ class Lehrveranstaltung(SWSEntity):
                                   verbose_name="Material (engl.)",
                                   help_text=u"Materialien für die Vorlesung (englische Beschreibung)")
 
+    nfk = models.ManyToManyField(
+        NichtfachlicheKompetenz,
+        verbose_name="Nichtfachliche Kompetenz",
+        help_text="Welche nichtfachlichen Kompetenzen werden durch diese Lehrveranstaltung erworben?",
+        blank=True,                         
+    )
+    
     def in_modul(self, modul):
         """A little helper function: check if this
         LV is in the modul given an parameter.

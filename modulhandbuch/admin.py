@@ -39,6 +39,7 @@ class OwnedAdmin(admin.ModelAdmin):
         # construct the field names to show:
         tmp = [f.name for f in self.model._meta.fields]
         # print "admin: ", self.__class__, tmp
+        # print "admin_fields: ", self.model.admin_fields
         try:
             tmp.remove('id')
             # tmp.remove('owner')
@@ -48,7 +49,8 @@ class OwnedAdmin(admin.ModelAdmin):
             # not all fields might be in all modules,
             # but that is not a problem
             pass
-        self.fields = tmp + ['editors', ]
+        self.fields = tmp + self.model.admin_fields + ['editors', ]
+        # print self.fields
 
         return res
 
