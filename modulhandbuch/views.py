@@ -87,6 +87,10 @@ class OrganisationsformView(SimpleListView):
     model = models.Organisationsform
 
 
+class NichtfachlicheKompetenzView(SimpleListView):
+    model = models.NichtfachlicheKompetenz
+
+
 class PruefungsformView(SimpleListView):
     model = models.Pruefungsform
 
@@ -201,6 +205,10 @@ class LehrveranstaltungenDetailView(SimpleDetailView):
 
 class OrganisationsformDetailView(SimpleDetailView):
     model = models.Organisationsform
+
+
+class NichtfachlicheKompetenzDetailView(SimpleDetailView):
+    model = models.NichtfachlicheKompetenz
 
 
 class PruefungsformDetailView(SimpleDetailView):

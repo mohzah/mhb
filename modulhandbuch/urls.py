@@ -114,6 +114,14 @@ urlpatterns = [
     url(r'/organisationsform/(?P<pk>[0-9]+)$',
         active_and_login_required(views.OrganisationsformDetailView.as_view()),
         name="organisationsformDetail"),
+
+    url(r'/nichtfachlichekompetenz$',
+        active_and_login_required(views.NichtfachlicheKompetenzView.as_view()),
+        name="nichtfachlichekompetenzList"),
+    url(r'/nichtfachlichekompetenz/(?P<pk>[0-9]+)$',
+        active_and_login_required(views.NichtfachlicheKompetenzDetailView.as_view()),
+        name="nichtfachlichekompetenzDetail"),
+
     
     url(r'/pruefungsform$',
         active_and_login_required(views.PruefungsformView.as_view()),

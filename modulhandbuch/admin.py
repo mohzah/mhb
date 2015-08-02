@@ -297,6 +297,11 @@ class OrganisationsformAdmin(OwnedAdmin):
     form = select2_modelform(Organisationsform, attrs={'width': '250px'})
 
 
+class NichtfachlicheKompetenzAdmin(OwnedAdmin):
+    model = NichtfachlicheKompetenz
+    form = select2_modelform(NichtfachlicheKompetenz, attrs={'width': '250px'})
+
+
 class LehrveranstaltungAdmin(OwnedAdmin):
     model = Lehrveranstaltung
     form = select2_modelform(Lehrveranstaltung, attrs={'width': '250px'})
@@ -308,6 +313,7 @@ admin.site.register(Fachgebiet, FachgebietAdmin)
 admin.site.register(Lehrender, LehrenderAdmin)
 admin.site.register(Pruefungsform, PruefungsformAdmin)
 admin.site.register(Organisationsform, OrganisationsformAdmin)
+admin.site.register(NichtfachlicheKompetenz, NichtfachlicheKompetenzAdmin)
 admin.site.register(Lehrveranstaltung, LehrveranstaltungAdmin)
 admin.site.register(Modul, ModulAdmin)
 admin.site.register(FocusArea, FocusAreaAdmin)

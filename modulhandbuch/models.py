@@ -204,6 +204,17 @@ class Organisationsform(DescribedEntity):
         ordering = ["nameDe", ]
 
 
+class NichtfachlicheKompetenz(DescribedEntity):
+    display_fields = ['nameDe', 'nameEn',
+                      'beschreibungDe', 'beschreibungEn',
+                      'editors']
+
+    class Meta:
+        verbose_name_plural = "Nichtfachliche Kompetenzen"
+        verbose_name = "Nichtfachliche Kompetenz"
+        ordering = ["nameDe", ]
+
+
 class Lehrender(URLEntity):
     display_fields = ['name', 'titel', 'url', 'fachgebiet', 'lehreinheit', 'editors']
 
