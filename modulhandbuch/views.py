@@ -361,6 +361,7 @@ class Generieren(TemplateView):
         _fachgebiete = models.Fachgebiet.objects.all()
         _pruefungsformen = models.Pruefungsform.objects.all()
         _organisationsformen = models.Organisationsform.objects.all()
+        _nichtfachlichekompetenzen = models.NichtfachlicheKompetenz.objects.all()
         _lehrende = models.Lehrender.objects.all()
         _studiengaenge = models.Studiengang.objects.all()
 
@@ -406,6 +407,7 @@ class Generieren(TemplateView):
                     focusareas=_focusareas,
                     lehrveranstaltungen=_lehrveranstaltungen,
                     studiengaenge=_studiengaenge,
+                    nichtfachlichekompetenzen=_nichtfachlichekompetenzen,
                     studiengang=studiengang,
                     startdatei=startdatei,
                 )
