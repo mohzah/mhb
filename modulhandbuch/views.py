@@ -359,9 +359,6 @@ class Generieren(TemplateView):
         # the concrete studiengang
         _lehreinheiten = models.Lehreinheit.objects.all()
         _fachgebiete = models.Fachgebiet.objects.all()
-        _pruefungsformen = models.Pruefungsform.objects.all()
-        _organisationsformen = models.Organisationsform.objects.all()
-        _nichtfachlichekompetenzen = models.NichtfachlicheKompetenz.objects.all()
         _lehrende = models.Lehrender.objects.all()
         _studiengaenge = models.Studiengang.objects.all()
 
@@ -372,13 +369,23 @@ class Generieren(TemplateView):
 
         _module = models.Modul.objects.filter(studiengang__id=studiengang.id)
 
-        _focusareas=models.FocusArea.objects.filter(studiengang__id=studiengang.id)
+        _focusareas = models.FocusArea.objects.filter(
+            studiengang__id=studiengang.id)
 
         # more complicated for the lehrveranstaltungen,
         # since we have to go via the modules first
         _vlpsQs = models.VeranstaltungsLps.objects.filter(modul__in=_module)
-        _lehrveranstaltungen = models.Lehrveranstaltung.objects.filter(veranstaltungslps__in=_vlpsQs).distinct()
+        _lehrveranstaltungen = models.Lehrveranstaltung.objects.filter(
+            veranstaltungslps__in=_vlpsQs).distinct()
 
+        # and limit other entities:
+        _pruefungsformen = models.Pruefungsform.objects.filter(
+            modul__in=_module)
+        _organisationsformen = models.Organisationsform.objects.filter(
+            modul__in=_module)
+        _nichtfachlichekompetenzen = models.NichtfachlicheKompetenz.objects.filter(
+            lehrveranstaltung__in=_lehrveranstaltungen)
+        
         ##########################
         # call the renderer for all files in the list
         for texdateiObj in texdateien:
