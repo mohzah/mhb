@@ -66,9 +66,6 @@ class OwnedAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
 
-        self.message_user(request,
-                          u"EDIT wird nur bei Einträgen angezeigt, die Sie editieren dürfen!")
-
         qs = qs.filter(Q(owner=request.user) |
                          Q(editors__in = [request.user])
                          ).distinct()
