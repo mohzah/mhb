@@ -450,6 +450,8 @@ class Studiengang(ResponsibleEntity):
         'startdateien',
         'beschreibungDe', 'beschreibungEn', 'editors']
 
+    admin_fields = ['startdateien', ]
+    
     module = models.ManyToManyField(Modul)
     focusareas = models.ManyToManyField(FocusArea)
     startdateien = models.ManyToManyField("TexDateien",
