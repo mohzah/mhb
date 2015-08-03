@@ -311,6 +311,9 @@ class Lehrveranstaltung(SWSEntity):
         help_text="Welche nichtfachlichen Kompetenzen werden durch diese Lehrveranstaltung erworben?",
         blank=True,                         
     )
+
+    def nfk_list(self):
+        return self.nfk.all()
     
     def in_modul(self, modul):
         """A little helper function: check if this
@@ -396,6 +399,13 @@ class Modul(ExaminedEntity):
     # TODO: If it stays a responsible entity, then we need methods
     # to ask for the SWS both here and in SWSEntity, for uniform access
     # (or Python property)
+
+    def nfk_list(self):
+        """get the nfks of all encompassed lehrveranstaltungen"""
+        nfkIds = VeranstaltungsLps.objects.filter(modul=self).values_list('veranstaltung__nfk').distinct()
+        nfks = NichtfachlicheKompetenz.objects.filter(id__in=nfkIds)
+
+        return nfks
 
     class Meta:
         verbose_name_plural = "Module"
