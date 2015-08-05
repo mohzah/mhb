@@ -433,8 +433,10 @@ class Modul(ExaminedEntity):
                 res['swsVl'] += lv.swsVl
                 res['swsUe'] += lv.swsUe
                 res['swsSonst'] += lv.swsSonst
-                res['swsSonstBeschreibungDe'].append(lv.swsSonstBeschreibungDe)
-                res['swsSonstBeschreibungEn'].append(lv.swsSonstBeschreibungEn)
+                if lv.swsSonstBeschreibungDe:
+                    res['swsSonstBeschreibungDe'].append(lv.swsSonstBeschreibungDe)
+                if lv.swsSonstBeschreibungEn:
+                    res['swsSonstBeschreibungEn'].append(lv.swsSonstBeschreibungEn)
         else:
             # complicated case, need to check whether
             # descipriotns are consistent
