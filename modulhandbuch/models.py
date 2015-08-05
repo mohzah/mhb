@@ -27,7 +27,7 @@ class OwnedEntity(models.Model):
     )
 
     admin_fields = []
-    
+
     def can_edit(self, user):
         """Every super user can edit,
         and the owner"""
@@ -257,7 +257,7 @@ class Lehrveranstaltung(SWSEntity):
                   ]
 
     admin_fields = ["nfk"]
-    
+
     termin = models.CharField(max_length=2,
                               verbose_name="Termin",
                               choices=(('WS', 'Wintersemester'),
@@ -309,12 +309,12 @@ class Lehrveranstaltung(SWSEntity):
         NichtfachlicheKompetenz,
         verbose_name="Nichtfachliche Kompetenz",
         help_text="Welche nichtfachlichen Kompetenzen werden durch diese Lehrveranstaltung erworben?",
-        blank=True,                         
+        blank=True,
     )
 
     def nfk_list(self):
         return self.nfk.all()
-    
+
     def in_modul(self, modul):
         """A little helper function: check if this
         LV is in the modul given an parameter.
@@ -407,6 +407,56 @@ class Modul(ExaminedEntity):
 
         return nfks
 
+    def getSWSText(self):
+        """Produce a summary of the SWS texts of the contained Lehrveranstaltungen.
+        Return it is a dictionary: hours of VL, UE, other, and list of other descriptions,
+        and warnings.
+        Do sanity-checking.
+        """
+
+        res = {'swsVl': 0,
+               'swsUe': 0,
+               'swsSonst': 0,
+               'swsSonstBeschreibungDe': [],
+               'swsSonstBeschreibungEn': [],
+               'warnings': [],
+        }
+
+        actualAnzahlLVs = self.veranstaltungslps_set.count()
+
+        if actualAnzahlLVs < self.anzahlLvs:
+            res['warnings'].append(u"Warnung: nicht genügend Lehrveranstatungen im Modul")
+        elif actualAnzahlLVs == self.anzahlLvs:
+            # easy case: just collect all together
+            for lvlps in self.veranstaltungslps_set.all():
+                lv = lvlps.veranstaltung
+                res['swsVl'] += lv.swsVl
+                res['swsUe'] += lv.swsUe
+                res['swsSonst'] += lv.swsSonst
+                res['swsSonstBeschreibungDe'].append(lv.swsSonstBeschreibungDe)
+                res['swsSonstBeschreibungEn'].append(lv.swsSonstBeschreibungEn)
+        else:
+            # complicated case, need to check whether
+            # descipriotns are consistent
+            # can only generate a plausible description if
+            # - all LVs have the same VL, UE, sonst a
+            # - and all descriptions are consistent
+            # otherwise: just return a warning
+
+            for attr in ['swsVl', 'swsUe', 'swsSonst',
+                         'swsSonstBeschreibungDe', 'swsSonstBeschreibungEn']:
+                tmp = set([getattr(lvlps.veranstaltung, attr)
+                           for lvlps in self.veranstaltungslps_set.all()])
+                if len(tmp) != actualAnzahlLVs:
+                    res['warnings'].append("Warnung: Inkonsistenz bei " + attr)
+                else:
+                    if "Beschreibung" in attr:
+                        res[attr] = [getattr(lvlps.veranstaltung, attr)]
+                    else:
+                        res[attr] = getattr(lvlps.veranstaltung, attr)
+
+        return res
+
     class Meta:
         verbose_name_plural = "Module"
         verbose_name = "Modul"
@@ -461,7 +511,7 @@ class Studiengang(ResponsibleEntity):
         'beschreibungDe', 'beschreibungEn', 'editors']
 
     admin_fields = ['startdateien', ]
-    
+
     module = models.ManyToManyField(Modul)
     focusareas = models.ManyToManyField(FocusArea)
     startdateien = models.ManyToManyField("TexDateien",
