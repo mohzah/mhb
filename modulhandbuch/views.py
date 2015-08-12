@@ -7,6 +7,8 @@ from django.core.urlresolvers import reverse
 
 from django.views.generic import View, TemplateView, FormView, ListView, DetailView
 
+from django.db.models import Q
+
 from django.shortcuts import redirect
 
 import django.db.models.fields.related as fieldsRelated
@@ -366,11 +368,19 @@ class Generieren(TemplateView):
         # those objects into the rendered that actually pertain to the
         # desired studiengang
         # (the "all" versions are just to ease testing)
-
-        _module = models.Modul.objects.filter(studiengang__id=studiengang.id)
-
+        
         _focusareas = models.FocusArea.objects.filter(
             studiengang__id=studiengang.id)
+
+        # build the Q object for getting all the modules that either 
+        # - are in the Studiengang itself, mentioned directly, or
+        # - are part of one of the studiengang's focusareas
+        q = Q(studiengang__id=studiengang.id)
+        for fa in _focusareas:
+            q = q | Q(focusarea=fa)
+            
+        _module = models.Modul.objects.filter(q)
+        # old: _module = models.Modul.objects.filter(studiengang__id=studiengang.id)
 
         # more complicated for the lehrveranstaltungen,
         # since we have to go via the modules first
