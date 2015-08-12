@@ -390,11 +390,11 @@ class Generieren(TemplateView):
 
         # and limit other entities:
         _pruefungsformen = models.Pruefungsform.objects.filter(
-            modul__in=_module)
+            modul__in=_module).distinct()
         _organisationsformen = models.Organisationsform.objects.filter(
-            modul__in=_module)
+            modul__in=_module).distinct()
         _nichtfachlichekompetenzen = models.NichtfachlicheKompetenz.objects.filter(
-            lehrveranstaltung__in=_lehrveranstaltungen)
+            lehrveranstaltung__in=_lehrveranstaltungen).distinct()
         
         ##########################
         # call the renderer for all files in the list
