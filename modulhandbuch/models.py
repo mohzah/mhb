@@ -63,6 +63,14 @@ class NamedEntity (URLEntity):
                               verbose_name="Name (engl.)",
                               help_text="Name, long version")
 
+    interneBemerkung = models.TextField(blank=True,
+                                        verbose_name=u"Interne Bemerkungen",
+                                        help_text=
+                                        u"""Beliebige Bemerkung, taucht NICHT im 
+                                        Modulhandbuch auf. Sinnvoll kann Notiz 
+                                        zu indentierten Studiengängen sein.""",
+    )
+    
     slug = AutoSlugField(populate_from='nameDe')
 
     def pageref(self, english=False):
@@ -75,7 +83,10 @@ class NamedEntity (URLEntity):
 
 
     def __unicode__(self):
-        return self.nameDe + " / " + self.nameEn
+        r = self.nameDe + " / " + self.nameEn
+        if self.interneBemerkung:
+            r += " ( " + self.interneBemerkung + " )" 
+        return r
 
     # end of class
 
