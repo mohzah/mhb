@@ -504,6 +504,8 @@ class FocusArea(ResponsibleEntity):
         'module',
         'beschreibungDe', 'beschreibungEn', 'editors']
 
+    admin_fields = ['module', ]
+
     module = models.ManyToManyField(Modul)
 
     class Meta:
