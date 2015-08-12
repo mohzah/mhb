@@ -379,7 +379,7 @@ class Generieren(TemplateView):
         for fa in _focusareas:
             q = q | Q(focusarea=fa)
             
-        _module = models.Modul.objects.filter(q)
+        _module = models.Modul.objects.filter(q).distinct()
         # old: _module = models.Modul.objects.filter(studiengang__id=studiengang.id)
 
         # more complicated for the lehrveranstaltungen,
