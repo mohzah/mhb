@@ -22,26 +22,24 @@
     </p>
     <hr>
     <p/>
-            
-    {% for obj, permission  in object_list %}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="col-md-6">
-                    {{ obj }}
-                </div>
-                <div class="col-md-3">
-                    <a class="btn btn-default" href="/modulhandbuch/{{ modelname|lower }}/{{ obj.id }}">
+
+    <table class="table table-striped">
+
+        {% for obj, permission  in object_list %}
+        <tr>
+            <td>{{ obj }} </td>
+            <td> <a class="btn btn-default" href="/modulhandbuch/{{ modelname|lower }}/{{ obj.id }}">
                         SHOW
                     </a>
-                </div>
-                <div class="col-md-3">
-                    {% if permission %}
-                        <a  class="btn btn-danger" href="/admin/modulhandbuch/{{ modelname|lower }}/{{ obj.id }}">
-                            EDIT
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    {% endfor %}
+            </td>
+            <td>
+                {% if permission %}
+                <a  class="btn btn-danger" href="/admin/modulhandbuch/{{ modelname|lower }}/{{ obj.id }}">
+                    EDIT
+                </a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
 {% endblock %}
