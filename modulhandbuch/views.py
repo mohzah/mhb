@@ -335,7 +335,6 @@ class Generieren(TemplateView):
             retval['output'] = e.output
             retval['cmd'] = e.cmd
             retval['returncode'] = e.returncode
-            retval['pdf'] = re.sub ('.tex$', '', fn) + '.pdf'
 
         return retval
 
