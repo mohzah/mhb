@@ -484,7 +484,7 @@ class Generieren(TemplateView):
                 error = ("Command {} failed with returncode: {} and output {}"
                          .format(retval['cmd'],retval['returncode'],retval['output'],
                              ))
-                res['pdf'] = settings.MEDIA_URL + "modulhandbuch/" + retval['pdf']
+                res['pdf'] = ""
             else:
                 # copy the produced PDF file to the destination
                 shutil.copyfile(os.path.join(tmpdir, retval['pdf']),
