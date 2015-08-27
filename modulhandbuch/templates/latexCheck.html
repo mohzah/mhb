@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title  %}
+    Modulhandbuch
+{% endblock %}
+{% block breadcrumb %}
+    <li><a href="/">Home</a></li>
+    <li><a href="{% url 'mhbhome' %}">Modulhandbuch</a></li>
+    <li class="active">LaTeX SyntaxCheck </li>
+{% endblock %}
+
+
+    {% block messages }
+    <div class="alert alert-warning">
+      Achtung experimentell!
+    </div>
+    {% endblock }
+    
+    {% block content %}
+    <h2> Ergebnis der Syntax-Überprüfung </h2>
+
+    Es werden nur Elemente mit Fehlern angezeigt! 
+    
+    {% for classname, elements in result.items %}
+    <h3> {{ classname }}  </h3>
+    <br>
+    {% for element  in elements  %}
+    {% if element.returncode %}
+      <div class="panel panel-danger">
+      <div class="panel-heading">
+        {{ element.el }}
+      </div>
+      <div class="panel-body">
+        {{ element.error }}
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+    <p>
+    {% endfor %}
+    {% endblock %}
