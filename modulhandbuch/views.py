@@ -305,38 +305,42 @@ class GenerierenAuswahl(TemplateView):
         return context
 
 
+
+def runLatex(fn, tempDir, twice=True):
+    """
+    Run pdflatex twice on filename; return suitable error codes
+    """
+
+    retval = {}
+    try:
+        # run PDF twice:
+        retval['output'] = subprocess.check_output (['pdflatex',
+                                                     '-interaction=nonstopmode',
+                                                     fn],
+                                                    stderr=subprocess.STDOUT,
+                                                    cwd = tempDir
+                                                    )
+
+        if twice:
+            retval['output'] = subprocess.check_output (['pdflatex',
+                                                         '-interaction=nonstopmode',
+                                                         fn],
+                                                        stderr=subprocess.STDOUT,
+                                                        cwd = tempDir
+                                                        )
+            
+        retval['returncode'] = 0
+        retval['pdf'] = re.sub ('.tex$', '', fn) + '.pdf'
+    except subprocess.CalledProcessError as e:
+        retval['output'] = e.output
+        retval['cmd'] = e.cmd
+        retval['returncode'] = e.returncode
+
+    return retval
+
+    
 class Generieren(TemplateView):
     template_name = "generatedPDFs.html"
-
-    def runLatex(self, fn, tempDir):
-        """
-        Run pdflatex twice on filename; return suitable error codes
-        """
-
-        retval = {}
-        try:
-            # run PDF twice:
-            retval['output'] = subprocess.check_output (['pdflatex',
-                                                         '-interaction=nonstopmode',
-                                                         fn],
-                                                        stderr=subprocess.STDOUT,
-                                                        cwd = tempDir
-                                                        )
-
-            retval['output'] = subprocess.check_output (['pdflatex',
-                                                         '-interaction=nonstopmode',
-                                                         fn],
-                                                        stderr=subprocess.STDOUT,
-                                                        cwd = tempDir
-                                                        )
-            retval['returncode'] = 0
-            retval['pdf'] = re.sub ('.tex$', '', fn) + '.pdf'
-        except subprocess.CalledProcessError as e:
-            retval['output'] = e.output
-            retval['cmd'] = e.cmd
-            retval['returncode'] = e.returncode
-
-        return retval
 
     def renderTexdateiObj(self, tmpdir, texdateien,
                           studiengang, startdatei,
@@ -473,7 +477,7 @@ class Generieren(TemplateView):
         for texdateiObj in startdateien:
             res = {'name': texdateiObj.filename}
             if texdateiObj.is_start_file():
-                retval = self.runLatex(texdateiObj.filename, tmpdir)
+                retval = runLatex(texdateiObj.filename, tmpdir)
             else:
                 retval = {}
                 retval['returncode'] = -1
@@ -677,3 +681,88 @@ class AbbildungenDeleteView(View):
         os.remove(fullfilename)
         
         return redirect("modulhandbuch/abbildung")
+
+
+class LatexCheckView(View):
+    """Go over all relevant objects and run a simple latex check on them"""
+
+
+    def run_latex(self, element, tmpdir):
+        """Write to temporary directory, run latex, 
+        grab the result."""
+
+        # which fields to write? lket's try the display_fields
+        tmpbody = []
+        for l in element.display_fields:
+            val = getattr(element, l) 
+            try:
+                val = val.__unicode__()
+            except:
+                val = unicode(val)
+
+            tmpbody.append(u"Feld: {} \n\n{}".format(l, val))
+                
+        body = u'\n\n'.join(tmpbody)
+
+        # create the actual tex document:
+        tex = (r"""
+\documentclass{article}
+\usepackage{booktabs}
+\usepackage{paralist}
+\usepackage{xtab}
+\usepackage{calc}
+\usepackage{url}
+\usepackage[utf8]{inputenc}
+\usepackage[table]{xcolor}
+\usepackage[ngerman]{babel}
+\usepackage{graphicx}
+\usepackage{mdframed}
+\usepackage[export]{adjustbox}
+\begin{document}
+""" + body +
+"""
+\end{document}
+""")
+
+        print tmpdir 
+        f = codecs.open(
+                    os.path.join(
+                        tmpdir,
+                        'main.tex'),
+                    'w', 'utf-8')
+        f.write(tex)
+        f.close()
+
+        retval = runLatex ('main.tex', tmpdir, twice=False)
+        
+        return (retval['returncode'],
+                retval['output'])
+        
+    def get(self, request):
+
+        tmpdir = tempfile.mkdtemp(suffix="modulhandbuch")
+        
+        result = {}
+        classes_to_check = [
+            models.Lehrveranstaltung,
+            models.Modul,
+            models.FocusArea,
+            models.Studiengang,
+        ]
+
+        for c in classes_to_check:
+            elements = []
+            for el in c.objects.all():
+                returncode, error = self.run_latex (el, tmpdir)
+                elements.append({
+                    'el': el,
+                    'returncode': returncode,
+                    'error': error,
+                })
+                
+            result[c.__name__] = elements
+
+        return render(request,
+                      'latexCheck.html',
+                      {'result': result})
+    

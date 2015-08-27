@@ -38,6 +38,11 @@ def active_and_login_required(function=None,
 urlpatterns = [
     # TODO: figure out how to limit admin to certain applications
     # TODO: Namen auf modulnamen vereinhetlichen; das hilft bei den breadcrumbs!
+
+    url(r'/latexcheck$',
+        active_and_login_required(views.LatexCheckView.as_view()),
+        name="latexcheck"),
+    
     url(r'/mhbhome.html$',
         active_and_login_required(
             TemplateView.as_view(template_name="mhome.html")),
@@ -56,32 +61,32 @@ urlpatterns = [
         active_and_login_required(
             active_and_login_required(views.GenerierenAuswahl.as_view())),
             name="modulhandbuchgenerieren"),
-    
+
     url(r'/generieren/(?P<sg>[0-9]+)/(?P<td>[0-9]+)$',
         active_and_login_required(views.Generieren.as_view()),
         name="modulhandbuchgenerierenPDF"),
 
-    ##### 
+    #####
     # URLs for the various objects:
     # naming convention: the names of the URL patterns MUST
     # be the lower-case model names, with List or Detail appended.
     # else, autmatically going back to the right URLs in change_form
     # does not work
-    
+
     url(r'/fachgebiet$',
         active_and_login_required(views.FachgebieteView.as_view()),
-        name="fachgebietList"), 
+        name="fachgebietList"),
     url(r'/fachgebiet/(?P<pk>[0-9]+)$',
         active_and_login_required(views.FachgebieteDetailView.as_view()),
         name="fachgebietDetail"),
-    
+
     url(r'/lehreinheit$',
         active_and_login_required(views.LehreinheitenView.as_view()),
         name="lehreinheitList"),
     url(r'/lehreinheit/(?P<pk>[0-9]+)$',
         active_and_login_required(views.LehreinheitenDetailView.as_view()),
         name="lehreinheitDetail"),
-    
+
     url(r'/lehrender$',
         active_and_login_required(views.LehrendeView.as_view()),
         name="lehrenderList"),
@@ -92,7 +97,7 @@ urlpatterns = [
         active_and_login_required(views.LehrendeDetailView.as_view()),
         name="lehrenderDetail"),
 
-    
+
     url(r'/lehrveranstaltung$',
         active_and_login_required(views.LehrveranstaltungenView.as_view()),
         name="lehrveranstaltungList"),
@@ -100,14 +105,14 @@ urlpatterns = [
         active_and_login_required(views.LehrveranstaltungenDetailView.as_view()),
         name="lehrveranstaltungDetail"),
 
-    
+
     url(r'/modul$',
         active_and_login_required(views.ModuleView.as_view()),
-        name="modulList"), 
+        name="modulList"),
     url(r'/modul/(?P<pk>[0-9]+)$',
         active_and_login_required(views.ModuleDetailView.as_view()),
         name="modulDetail"),
-    
+
     url(r'/organisationsform$',
         active_and_login_required(views.OrganisationsformView.as_view()),
         name="organisationsformList"),
@@ -122,31 +127,31 @@ urlpatterns = [
         active_and_login_required(views.NichtfachlicheKompetenzDetailView.as_view()),
         name="nichtfachlichekompetenzDetail"),
 
-    
+
     url(r'/pruefungsform$',
         active_and_login_required(views.PruefungsformView.as_view()),
         name="pruefungsformList"),
     url(r'/pruefungsform/(?P<pk>[0-9]+)$',
         active_and_login_required(views.PruefungsformDetailView.as_view()),
         name="pruefungsformDetail"),
-    
+
     url(r'/studiengang$',
         active_and_login_required(views.StudiengangView.as_view()),
         name="studiengangList"),
     url(r'/studiengang/(?P<pk>[0-9]+)$',
         active_and_login_required(views.StudiengangDetailView.as_view()),
         name="studiengangDetail"),
-    
+
     url(r'/focusarea$',
         active_and_login_required(views.FocusAreaView.as_view()),
-        name="focusareaList"), 
+        name="focusareaList"),
     url(r'/focusarea/(?P<pk>[0-9]+)$',
         active_and_login_required(views.FocusAreaDetailView.as_view()),
         name="focusareaDetail"),
 
     url(r'/texdatei$',
         active_and_login_required(views.TexDateienView.as_view()),
-        name="texdateienList"), 
+        name="texdateienList"),
     url(r'/texdateien/(?P<pk>[0-9]+)$',
         active_and_login_required(views.TexDateienDetailView.as_view()),
         name="texdateienDetail"),
@@ -157,10 +162,10 @@ urlpatterns = [
 
     url(r'/abbildungAdd$',
         active_and_login_required(views.AbbildungenAddView.as_view()),
-        name="abbildungAdd"),  
-    
+        name="abbildungAdd"),
+
     url(r'/abbildungDelete/(?P<filename>.+)$',
         active_and_login_required(views.AbbildungenDeleteView.as_view()),
-        name="abbildungDelete"),  
-]
+        name="abbildungDelete"),
 
+]
