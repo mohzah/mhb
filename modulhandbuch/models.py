@@ -462,7 +462,7 @@ class Modul(ExaminedEntity):
                          'swsSonstBeschreibungDe', 'swsSonstBeschreibungEn']:
                 tmp = set([getattr(lvlps.veranstaltung, attr)
                            for lvlps in self.veranstaltungslps_set.all()])
-                if len(tmp) != actualAnzahlLVs:
+                if len(tmp) != self.anzahlLvs:
                     try:
                         res['warnings'].append("Warnung: Inkonsistenz bei " +
                                                attr + ": " +
