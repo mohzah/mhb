@@ -147,3 +147,10 @@ if os.environ.get('DB_HOST'):
 else:
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
     MEDIA_URL = '/media/'
+
+
+# needed to make this work with bootstrap labels
+from django.contrib.messages import constants as messages
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger'
+}    

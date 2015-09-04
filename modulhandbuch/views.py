@@ -4,6 +4,9 @@ from django.shortcuts import render
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
+from django.contrib import messages
+
 
 from django.views.generic import View, TemplateView, FormView, ListView, DetailView
 
@@ -12,6 +15,8 @@ from django.db.models import Q
 from django.shortcuts import redirect
 
 import django.db.models.fields.related as fieldsRelated
+
+from django.contrib.contenttypes.models  import ContentType
 
 import models
 import forms
@@ -766,3 +771,53 @@ class LatexCheckView(View):
                       'latexCheck.html',
                       {'result': result})
     
+
+class CopyView(View):
+    """Make a copy of an object 
+    for a given model name"""
+
+    def get(self, request, model, pk):
+        print "in copy view"
+        print model, pk
+
+
+        # get the class:
+        try:
+            user_type = ContentType.objects.get(
+                app_label="modulhandbuch",
+                model=model)
+        except:
+            messages.add_message(request,
+                                 messages.ERROR,
+                                 "Klasse nicht bekannt")
+            print "class not found"
+            r = redirect('modulhandbuchansehen')
+            return r
+
+        # get the object:
+        try:
+            o = user_type.get_object_for_this_type(
+                pk=int(pk))
+        except:
+            messages.add_message(request,
+                                 messages.ERROR,
+                                 "Objekt nicht bekannt")
+            print "object not found"
+            return redirect(model+'List')
+
+        # make the copy:
+        o.pk = None
+        try: 
+            o.nameDe += " COPY"
+            o.nameEn += " COPY"
+        except AttributeError:
+            o.name += " COPY"
+            
+        o.save()
+
+        messages.add_message(request,
+                             messages.INFO,
+                             'Kopie angelegt, bitte editieren.')
+        
+        return redirect("/admin/modulhandbuch/{}/{}"
+                        .format(model, o.pk))

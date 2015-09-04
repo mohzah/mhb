@@ -66,6 +66,13 @@ urlpatterns = [
         active_and_login_required(views.Generieren.as_view()),
         name="modulhandbuchgenerierenPDF"),
 
+    # make a copy of an object:
+    url(r'/copy/(?P<model>.+)/(?P<pk>[0-9]+)$',
+        active_and_login_required(views.CopyView.as_view()),
+        name="copyView"),
+
+
+    
     #####
     # URLs for the various objects:
     # naming convention: the names of the URL patterns MUST

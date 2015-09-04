@@ -12,6 +12,16 @@
 {% endblock %}
 
 
+    {% block messages %}
+    {% if messages %} 
+    {% for message in messages %}
+    <div class="alert{% if message.tags %} alert-{{ message.tags }}{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endblock %}
+
 {% block content %}
     
 
@@ -38,6 +48,11 @@
                     EDIT
                 </a>
                 {% endif %}
+            </td>
+            <td>
+                <a  class="btn btn-info" href="/modulhandbuch/copy/{{ modelname|lower }}/{{ obj.id }}">
+                    COPY
+                </a>
             </td>
         </tr>
         {% endfor %}
