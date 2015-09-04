@@ -66,11 +66,11 @@ class NamedEntity (URLEntity):
     interneBemerkung = models.TextField(blank=True,
                                         verbose_name=u"Interne Bemerkungen",
                                         help_text=
-                                        u"""Beliebige Bemerkung, taucht NICHT im 
-                                        Modulhandbuch auf. Sinnvoll kann Notiz 
+                                        u"""Beliebige Bemerkung, taucht NICHT im
+                                        Modulhandbuch auf. Sinnvoll kann Notiz
                                         zu intendierten Studiengängen sein.""",
     )
-    
+
     slug = AutoSlugField(populate_from='nameDe')
 
     def pageref(self, english=False):
@@ -85,7 +85,7 @@ class NamedEntity (URLEntity):
     def __unicode__(self):
         r = self.nameDe + " / " + self.nameEn
         if self.interneBemerkung:
-            r += " ( " + self.interneBemerkung + " )" 
+            r += " ( " + self.interneBemerkung + " )"
         return r
 
     # end of class
@@ -445,9 +445,11 @@ class Modul(ExaminedEntity):
                 res['swsUe'] += lv.swsUe
                 res['swsSonst'] += lv.swsSonst
                 if lv.swsSonstBeschreibungDe:
-                    res['swsSonstBeschreibungDe'].append(lv.swsSonstBeschreibungDe)
+                    res['swsSonstBeschreibungDe'].append(
+                        lv.swsSonstBeschreibungDe)
                 if lv.swsSonstBeschreibungEn:
-                    res['swsSonstBeschreibungEn'].append(lv.swsSonstBeschreibungEn)
+                    res['swsSonstBeschreibungEn'].append(
+                        lv.swsSonstBeschreibungEn)
         else:
             # complicated case, need to check whether
             # descipriotns are consistent
@@ -461,7 +463,14 @@ class Modul(ExaminedEntity):
                 tmp = set([getattr(lvlps.veranstaltung, attr)
                            for lvlps in self.veranstaltungslps_set.all()])
                 if len(tmp) != actualAnzahlLVs:
-                    res['warnings'].append("Warnung: Inkonsistenz bei " + attr)
+                    try:
+                        res['warnings'].append("Warnung: Inkonsistenz bei " +
+                                               attr + ": " +
+                                               ', '.join([str(x) for x in tmp]))
+                    except Exception as e:
+                        res['warnings'].append("Warnung: Inkonsistenz bei " +
+                                               attr +
+                                               "; Exception  " + e.strerror)
                 else:
                     if "Beschreibung" in attr:
                         res[attr] = [getattr(lvlps.veranstaltung, attr)]
