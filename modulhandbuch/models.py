@@ -68,7 +68,7 @@ class NamedEntity (URLEntity):
                                         help_text=
                                         u"""Beliebige Bemerkung, taucht NICHT im 
                                         Modulhandbuch auf. Sinnvoll kann Notiz 
-                                        zu indentierten Studiengängen sein.""",
+                                        zu intendierten Studiengängen sein.""",
     )
     
     slug = AutoSlugField(populate_from='nameDe')
