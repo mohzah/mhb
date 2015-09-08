@@ -49,11 +49,13 @@
                 </a>
                 {% endif %}
             </td>
+            {% comment %}
             <td>
                 <a  class="btn btn-info" href="/modulhandbuch/copy/{{ modelname|lower }}/{{ obj.id }}">
                     COPY
                 </a>
             </td>
+            {% endcomment %}
         </tr>
         {% endfor %}
     </table>
