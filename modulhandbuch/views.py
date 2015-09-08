@@ -777,8 +777,8 @@ class CopyView(View):
     for a given model name"""
 
     def get(self, request, model, pk):
-        print "in copy view"
-        print model, pk
+        # print "in copy view"
+        # print model, pk
 
 
         # get the class:
@@ -807,17 +807,29 @@ class CopyView(View):
 
         # make the copy:
         o.pk = None
+        o.id = None
+        # set the owner to the copier:
+        o.owner = request.user
+        
         try: 
             o.nameDe += " COPY"
             o.nameEn += " COPY"
         except AttributeError:
             o.name += " COPY"
-            
-        o.save()
 
-        messages.add_message(request,
-                             messages.INFO,
-                             'Kopie angelegt, bitte editieren.')
-        
+        try:
+            # print "now saving"
+            o.save()
+            # print "saved"
+            messages.add_message(request,
+                                 messages.INFO,
+                                 'Kopie angelegt, bitte editieren.')
+        except:
+            messages.add_message(request,
+                                 messages.ERROR,
+                                 "Anlegen der Kopie gescheitert")
+            return redirect(model+'List')
+            
+
         return redirect("/admin/modulhandbuch/{}/{}"
                         .format(model, o.pk))
