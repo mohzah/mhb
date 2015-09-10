@@ -352,7 +352,7 @@ def runLatex(fn, tempDir, twice=True):
                                                         stderr=subprocess.STDOUT,
                                                         cwd = tempDir
                                                         )
-            
+
         retval['returncode'] = 0
         retval['pdf'] = re.sub ('.tex$', '', fn) + '.pdf'
     except subprocess.CalledProcessError as e:
@@ -362,7 +362,7 @@ def runLatex(fn, tempDir, twice=True):
 
     return retval
 
-    
+
 class Generieren(TemplateView):
     template_name = "generatedPDFs.html"
 
@@ -396,17 +396,17 @@ class Generieren(TemplateView):
         # those objects into the rendered that actually pertain to the
         # desired studiengang
         # (the "all" versions are just to ease testing)
-        
+
         _focusareas = models.FocusArea.objects.filter(
             studiengang__id=studiengang.id)
 
-        # build the Q object for getting all the modules that either 
+        # build the Q object for getting all the modules that either
         # - are in the Studiengang itself, mentioned directly, or
         # - are part of one of the studiengang's focusareas
         q = Q(studiengang__id=studiengang.id)
         for fa in _focusareas:
             q = q | Q(focusarea=fa)
-            
+
         _module = models.Modul.objects.filter(q).distinct()
         # old: _module = models.Modul.objects.filter(studiengang__id=studiengang.id)
 
@@ -423,7 +423,7 @@ class Generieren(TemplateView):
             modul__in=_module).distinct()
         _nichtfachlichekompetenzen = models.NichtfachlicheKompetenz.objects.filter(
             lehrveranstaltung__in=_lehrveranstaltungen).distinct()
-        
+
         ##########################
         # call the renderer for all files in the list
         for texdateiObj in texdateien:
@@ -641,13 +641,13 @@ class AbbildungenView(ListView):
         r = [x
              for x in r
              if not x.endswith("-thumbnail.png")]
-        
+
         # provide separate entries for the file itself and a thumbnail
         r = [ (x,
                x[:-4] + "-thumbnail.png" if x.endswith('.pdf') else x)
               for x in r
-          ] 
-        
+          ]
+
         return r
 
 class AbbildungenAddView(FormView):
@@ -703,7 +703,7 @@ class AbbildungenDeleteView(View):
         )
 
         os.remove(fullfilename)
-        
+
         return redirect("modulhandbuch/abbildung")
 
 
@@ -712,20 +712,20 @@ class LatexCheckView(View):
 
 
     def run_latex(self, element, tmpdir):
-        """Write to temporary directory, run latex, 
+        """Write to temporary directory, run latex,
         grab the result."""
 
         # which fields to write? lket's try the display_fields
         tmpbody = []
         for l in element.display_fields:
-            val = getattr(element, l) 
+            val = getattr(element, l)
             try:
                 val = val.__unicode__()
             except:
                 val = unicode(val)
 
             tmpbody.append(u"Feld: {} \n\n{}".format(l, val))
-                
+
         body = u'\n\n'.join(tmpbody)
 
         # create the actual tex document:
@@ -748,7 +748,7 @@ class LatexCheckView(View):
 \end{document}
 """)
 
-        print tmpdir 
+        print tmpdir
         f = codecs.open(
                     os.path.join(
                         tmpdir,
@@ -758,14 +758,14 @@ class LatexCheckView(View):
         f.close()
 
         retval = runLatex ('main.tex', tmpdir, twice=False)
-        
+
         return (retval['returncode'],
                 retval['output'])
-        
+
     def get(self, request):
 
         tmpdir = tempfile.mkdtemp(suffix="modulhandbuch")
-        
+
         result = {}
         classes_to_check = [
             models.Lehrveranstaltung,
@@ -783,16 +783,16 @@ class LatexCheckView(View):
                     'returncode': returncode,
                     'error': error,
                 })
-                
+
             result[c.__name__] = elements
 
         return render(request,
                       'latexCheck.html',
                       {'result': result})
-    
+
 
 class CopyView(View):
-    """Make a copy of an object 
+    """Make a copy of an object
     for a given model name"""
 
     def get(self, request, model, pk):
@@ -829,8 +829,8 @@ class CopyView(View):
         o.id = None
         # set the owner to the copier:
         o.owner = request.user
-        
-        try: 
+
+        try:
             o.nameDe += " COPY"
             o.nameEn += " COPY"
         except AttributeError:
@@ -848,7 +848,29 @@ class CopyView(View):
                                  messages.ERROR,
                                  "Anlegen der Kopie gescheitert")
             return redirect(model+'List')
-            
 
+        ##################
+        # copy the many2many fields:
+
+        # get the original object again;
+        # this should be done without a new database hit
+        orgobj = user_type.get_object_for_this_type(
+            pk=int(pk))
+
+        print "the objects: ", orgobj.pk, o.pk
+        print "m2m fields: ", orgobj._meta.many_to_many
+
+        for fname in orgobj._meta.many_to_many:
+            fcontent = getattr(orgobj, fname.name).all()
+            for f in fcontent:
+                getattr(o, fname.name).add(f)
+
+        # now copy VeranstaltungsLps, if they exist
+        try:
+            o.copyLV(orgobj)
+        except AttributeError:
+            pass
+        
+        # done, redirect to the admin for further editing:
         return redirect("/admin/modulhandbuch/{}/{}"
                         .format(model, o.pk))

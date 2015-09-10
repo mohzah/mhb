@@ -353,6 +353,24 @@ class Lehrveranstaltung(SWSEntity):
 
         return lp
 
+    def copyLV(self, orgObj):
+        """copy the VeranstaltungsLps over from the
+        Lehrveranstaltung orgObj"""
+
+        # print "trying to copy VeranstaltungsLps"
+
+        vlps = orgObj.veranstaltungslps_set.all()
+        # print "vlps: ", vlps
+
+        for x in vlps:
+            # print x
+            tmp = VeranstaltungsLps(
+                veranstaltung=self,
+                modul=x.modul,
+                lp=x.lp,
+            )
+            tmp.save()
+
     class Meta:
         verbose_name_plural = "Lehrveranstaltungen"
         verbose_name = "Lehrveranstaltung"
@@ -478,6 +496,25 @@ class Modul(ExaminedEntity):
                         res[attr] = getattr(lvlps.veranstaltung, attr)
 
         return res
+
+    def copyLV(self, orgObj):
+        """copy the VeranstaltungsLps over from the
+        Module orgObj"""
+
+        # print "trying to copy VeranstaltungsLps"
+
+        vlps = orgObj.veranstaltungslps_set.all()
+        # print "vlps: ", vlps
+
+        for x in vlps:
+            # print x
+            tmp = VeranstaltungsLps(
+                veranstaltung=x.veranstaltung,
+                modul=self,
+                lp=x.lp,
+            )
+            tmp.save()
+
 
     class Meta:
         verbose_name_plural = "Module"
