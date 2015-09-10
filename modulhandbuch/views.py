@@ -209,6 +209,25 @@ class LehrendeDetailView(SimpleDetailView):
 class LehrveranstaltungenDetailView(SimpleDetailView):
     model = models.Lehrveranstaltung
 
+    def get_context_data(self, **kwargs):
+        context = super(LehrveranstaltungenDetailView,
+                        self).get_context_data(**kwargs)
+
+        # get all the lehrveranstaltungen via the intermediary
+        # work around; _set seems to have issues with inheritance :-(
+        veranstaltungslps = models.VeranstaltungsLps.objects.filter(
+            veranstaltung=self.object)
+
+        for lvlps in veranstaltungslps:
+            context['fields'].append(
+                ( "Module " + lvlps.modul.__unicode__(),
+                  lvlps.lp,
+                  "Anzahl LPs in diesem Modul",
+              )
+            )
+
+        return context
+
 
 class OrganisationsformDetailView(SimpleDetailView):
     model = models.Organisationsform
