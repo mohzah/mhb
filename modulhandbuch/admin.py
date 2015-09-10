@@ -50,7 +50,7 @@ class OwnedAdmin(admin.ModelAdmin):
             # but that is not a problem
             pass
         self.fields = tmp + self.model.admin_fields + ['editors', ]
-        # print self.fields
+
         # print "init owned admin: ", self, self.fields
 
         return res
