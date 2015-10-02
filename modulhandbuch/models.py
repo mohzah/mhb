@@ -159,7 +159,7 @@ class SWSEntity(ResponsibleEntity):
         and selbststudium.
         """
         return int(math.ceil(
-            15*1.5*(self.swsVl + self.swsUe + self.swsSonst) +
+            15*(self.swsVl + self.swsUe + self.swsSonst) +
             self.selbststudium))
 
     sprache = models.CharField(max_length=2,
