@@ -615,7 +615,7 @@ class Generieren(TemplateView):
 
 
         # delete temp directoy and content
-        shutil.rmtree(tmpdir, ignore_errors=True)
+        # shutil.rmtree(tmpdir, ignore_errors=True)
 
         # collect all the results in context and return
         context['globalerror'] = globalerror
