@@ -71,7 +71,9 @@ class NamedEntity (URLEntity):
                                         zu intendierten Studiengängen sein.""",
     )
 
-    slug = AutoSlugField(populate_from='nameDe')
+    slug = AutoSlugField(populate_from='nameDe',
+                         always_update=True,
+                         unique=False)
 
     def pageref(self, english=False):
         if english:
