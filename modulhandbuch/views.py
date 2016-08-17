@@ -338,6 +338,7 @@ def runLatex(fn, tempDir, twice=True):
     retval = {}
     try:
         # run PDF twice:
+	print("running pdflatex once")
         retval['output'] = subprocess.check_output (['pdflatex',
                                                      '-interaction=nonstopmode',
                                                      fn],
@@ -347,6 +348,7 @@ def runLatex(fn, tempDir, twice=True):
 
         if twice:
             for i in range(2):
+	        print("running pdflatex twice")
                 retval['output'] = subprocess.check_output (['pdflatex',
                                                             '-interaction=nonstopmode',
                                                             fn],
