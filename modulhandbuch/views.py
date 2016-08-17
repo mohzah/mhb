@@ -346,12 +346,13 @@ def runLatex(fn, tempDir, twice=True):
                                                     )
 
         if twice:
-            retval['output'] = subprocess.check_output (['pdflatex',
-                                                         '-interaction=nonstopmode',
-                                                         fn],
-                                                        stderr=subprocess.STDOUT,
-                                                        cwd = tempDir
-                                                        )
+            for i in range(2):
+                retval['output'] = subprocess.check_output (['pdflatex',
+                                                            '-interaction=nonstopmode',
+                                                            fn],
+                                                            stderr=subprocess.STDOUT,
+                                                            cwd = tempDir
+                                                            )
 
         retval['returncode'] = 0
         retval['pdf'] = re.sub ('.tex$', '', fn) + '.pdf'
