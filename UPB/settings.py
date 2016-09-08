@@ -63,7 +63,7 @@ MIDDLEWARE_CLASSES = (
 KRB5_REALM = "UNI-PADERBORN.DE"
 
 AUTHENTICATION_BACKENDS = (
-    'UPB.kerbauth.KerbAuth',
+    # 'UPB.kerbauth.KerbAuth',
     # 'django_auth_krb.backends.KrbBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
