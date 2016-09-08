@@ -137,15 +137,15 @@ class SWSEntity(ResponsibleEntity):
     swsUe = models.IntegerField(default=0,
                                 verbose_name=u"SWS Übung",
                                 help_text=u"Anzahl SWS für Übungen")
-    swsSonst = models.IntegerField(default=0,
-                                   verbose_name="Sonstige SWS",
-                                   help_text=u"Anzahl SWS für andere Bestandteile")
-    swsSonstBeschreibungDe = models.CharField(max_length=300, blank=True,
-                                              verbose_name="Beschreibung",
-                                              help_text="Beschreibung anderer Bestandteile")
-    swsSonstBeschreibungEn = models.CharField(max_length=300, blank=True,
-                                              verbose_name="Beschreibung (engl.)",
-                                              help_text="Description of other parts of the lecture")
+    swsPraktikum = models.IntegerField(default=0,
+                                   verbose_name="Praktikum SWS",
+                                   help_text=u"Anzahl SWS für Praktikumteile")
+    # swsSonstBeschreibungDe = models.CharField(max_length=300, blank=True,
+    #                                           verbose_name="Beschreibung",
+    #                                           help_text="Beschreibung anderer Bestandteile")
+    # swsSonstBeschreibungEn = models.CharField(max_length=300, blank=True,
+    #                                           verbose_name="Beschreibung (engl.)",
+    #                                           help_text="Description of other parts of the lecture")
     selbststudium = models.IntegerField(default=0,
                                         verbose_name="Selbststudium",
                                         help_text=
@@ -161,7 +161,7 @@ class SWSEntity(ResponsibleEntity):
         and selbststudium.
         """
         return int(math.ceil(
-            15*(self.swsVl + self.swsUe + self.swsSonst) +
+            15*(self.swsVl + self.swsUe + self.swsPraktikum) +
             self.selbststudium))
 
     sprache = models.CharField(max_length=2,
@@ -256,8 +256,8 @@ class Lehrveranstaltung(SWSEntity):
     display_fields = ['nameDe', 'nameEn',
                       'verantwortlicher',
                       'beschreibungDe', 'beschreibungEn',
-                      'swsVl', 'swsUe', 'swsSonst',
-                      'swsSonstBeschreibungDe', 'swsSonstBeschreibungEn',
+                      'swsVl', 'swsUe', 'swsPraktikum',
+                      # 'swsSonstBeschreibungDe', 'swsSonstBeschreibungEn',
                       'termin',
                       'zielsemester',
                       'inhaltDe', 'inhaltEn',
@@ -447,9 +447,9 @@ class Modul(ExaminedEntity):
 
         res = {'swsVl': 0,
                'swsUe': 0,
-               'swsSonst': 0,
-               'swsSonstBeschreibungDe': [],
-               'swsSonstBeschreibungEn': [],
+               'swsPraktikum': 0,
+               # 'swsSonstBeschreibungDe': [],
+               # 'swsSonstBeschreibungEn': [],
                'warnings': [],
         }
 
@@ -463,13 +463,13 @@ class Modul(ExaminedEntity):
                 lv = lvlps.veranstaltung
                 res['swsVl'] += lv.swsVl
                 res['swsUe'] += lv.swsUe
-                res['swsSonst'] += lv.swsSonst
-                if lv.swsSonstBeschreibungDe:
-                    res['swsSonstBeschreibungDe'].append(
-                        lv.swsSonstBeschreibungDe)
-                if lv.swsSonstBeschreibungEn:
-                    res['swsSonstBeschreibungEn'].append(
-                        lv.swsSonstBeschreibungEn)
+                res['swsPraktikum'] += lv.swsPraktikum
+                # if lv.swsSonstBeschreibungDe:
+                #     res['swsSonstBeschreibungDe'].append(
+                #         lv.swsSonstBeschreibungDe)
+                # if lv.swsSonstBeschreibungEn:
+                #     res['swsSonstBeschreibungEn'].append(
+                #         lv.swsSonstBeschreibungEn)
         else:
             # complicated case, need to check whether
             # descipriotns are consistent
@@ -478,8 +478,9 @@ class Modul(ExaminedEntity):
             # - and all descriptions are consistent
             # otherwise: just return a warning
 
-            for attr in ['swsVl', 'swsUe', 'swsSonst',
-                         'swsSonstBeschreibungDe', 'swsSonstBeschreibungEn']:
+            for attr in ['swsVl', 'swsUe', 'swsPraktikum',
+                         # 'swsSonstBeschreibungDe', 'swsSonstBeschreibungEn'
+                         ]:
                 tmp = set([getattr(lvlps.veranstaltung, attr)
                            for lvlps in self.veranstaltungslps_set.all()])
                 if len(tmp) != self.anzahlLvs:
@@ -492,10 +493,10 @@ class Modul(ExaminedEntity):
                                                attr +
                                                "; Exception  " + e.strerror)
                 else:
-                    if "Beschreibung" in attr:
-                        res[attr] = [getattr(lvlps.veranstaltung, attr)]
-                    else:
-                        res[attr] = getattr(lvlps.veranstaltung, attr)
+                    # if "Beschreibung" in attr:
+                    #     res[attr] = [getattr(lvlps.veranstaltung, attr)]
+                    # else:
+                    res[attr] = getattr(lvlps.veranstaltung, attr)
 
         return res
 
