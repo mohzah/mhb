@@ -63,13 +63,13 @@ class NamedEntity (URLEntity):
                               verbose_name="Name (engl.)",
                               help_text="Name, long version")
 
-    interneBemerkung = models.TextField(blank=True,
-                                        verbose_name=u"Interne Bemerkungen",
-                                        help_text=
-                                        u"""Beliebige Bemerkung, taucht NICHT im
-                                        Modulhandbuch auf. Sinnvoll kann Notiz
-                                        zu intendierten Studiengängen sein.""",
-    )
+    # interneBemerkung = models.TextField(blank=True,
+    #                                     verbose_name=u"Interne Bemerkungen",
+    #                                     help_text=
+    #                                     u"""Beliebige Bemerkung, taucht NICHT im
+    #                                     Modulhandbuch auf. Sinnvoll kann Notiz
+    #                                     zu intendierten Studiengängen sein.""",
+    # )
 
     slug = AutoSlugField(populate_from='nameDe',
                          always_update=True,
@@ -86,8 +86,8 @@ class NamedEntity (URLEntity):
 
     def __unicode__(self):
         r = self.nameDe + " / " + self.nameEn
-        if self.interneBemerkung:
-            r += " ( " + self.interneBemerkung + " )"
+        # if self.interneBemerkung:
+        #     r += " ( " + self.interneBemerkung + " )"
         return r
 
     # end of class
@@ -327,6 +327,12 @@ class Lehrveranstaltung(SWSEntity):
     materialEn = models.TextField(blank=True,
                                   verbose_name="Material (engl.)",
                                   help_text=u"Materialien für die Vorlesung (englische Beschreibung)")
+    # ToDo: check if removing interneBemerkung doesn't cause any problem
+    # remove it from parent class
+    # don't want to inherit this field
+    # django doesn't allow overriding Fields
+    # https://docs.djangoproject.com/en/1.10/topics/db/models/
+    # interneBemerkung = None
 
     nfk = models.ManyToManyField(
         NichtfachlicheKompetenz,
