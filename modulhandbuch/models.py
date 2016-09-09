@@ -140,6 +140,8 @@ class SWSEntity(ResponsibleEntity):
     swsPraktikum = models.IntegerField(default=0,
                                    verbose_name="Praktikum SWS",
                                    help_text=u"Anzahl SWS für Praktikumteile")
+    ects = models.IntegerField(default=0,
+                               verbose_name="ECTS")
     # swsSonstBeschreibungDe = models.CharField(max_length=300, blank=True,
     #                                           verbose_name="Beschreibung",
     #                                           help_text="Beschreibung anderer Bestandteile")
@@ -257,13 +259,14 @@ class Lehrveranstaltung(SWSEntity):
                       'verantwortlicher',
                       'beschreibungDe', 'beschreibungEn',
                       'swsVl', 'swsUe', 'swsPraktikum',
+                      'ects',
                       # 'swsSonstBeschreibungDe', 'swsSonstBeschreibungEn',
                       'termin',
                       'zielsemester',
                       'inhaltDe', 'inhaltEn',
-                      'lernergebnisDe', 'lernergebnisEn',
+                      'lernergebnisDe', #'lernergebnisEn',
                       'methodikDe', 'methodikEn',
-                      'vorkenntnisseDe', 'vorkenntnisseEn',
+                      'vorkenntnisseDe', #'vorkenntnisseEn',
                       'materialDe', 'materialEn',
                       'nfk',
                       'editors'
@@ -271,6 +274,13 @@ class Lehrveranstaltung(SWSEntity):
 
     admin_fields = ["nfk"]
 
+    lv_nr = models.CharField(max_length=50,
+                             blank=True,
+                             verbose_name="LV-NR",
+                             )
+    contact_time_hour = models.CharField(max_length=70,
+                                         blank=True,
+                                         verbose_name='Contact time hour')
     termin = models.CharField(max_length=2,
                               verbose_name="Termin",
                               choices=(('WS', 'Wintersemester'),
@@ -290,13 +300,13 @@ class Lehrveranstaltung(SWSEntity):
                                 verbose_name="Inhalt (engl.)",
     )
     lernergebnisDe = models.TextField(blank=True,
-                                      verbose_name="Lernergebnis",
+                                      verbose_name="Lernergebnis und Kompetenzen",
                                       help_text=
                                       "Kompetenzorientierte Beschreibung")
-    lernergebnisEn = models.TextField(blank=True,
-                                      verbose_name="Lernergebnis (engl.)",
-                                      help_text=
-                                      "Kompetenzorientierte Beschreibung (engl.)")
+    # lernergebnisEn = models.TextField(blank=True,
+    #                                   verbose_name="Lernergebnis (engl.)",
+    #                                   help_text=
+    #                                   "Kompetenzorientierte Beschreibung (engl.)")
     methodikDe = models.TextField(blank=True,
                                   verbose_name="Methodik",
                                   help_text="Beschreibung der Lehrmethoden")
@@ -304,11 +314,11 @@ class Lehrveranstaltung(SWSEntity):
                                   verbose_name="Methodik (engl.)",
                                   help_text="Beschreibung der Lehrmethoden (engl.)")
     vorkenntnisseDe = models.TextField(blank=True,
-                                       verbose_name="Vorkenntnisse",
+                                       verbose_name="Empfohlene Vorkenntnisse",
                                        help_text="Sinnvolle Vorkenntnisse")
-    vorkenntnisseEn = models.TextField(blank=True,
-                                       verbose_name="Vorkenntnisse (engl.)",
-                                       help_text="Sinnvolle Vorkenntnisse (engl.)")
+    # vorkenntnisseEn = models.TextField(blank=True,
+    #                                    verbose_name="Vorkenntnisse (engl.)",
+    #                                    help_text="Sinnvolle Vorkenntnisse (engl.)")
     # kombinationDe = models.TextField(blank=True)
     # kombinationEn = models.TextField(blank=True)
     materialDe = models.TextField(blank=True,
