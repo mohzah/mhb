@@ -33,6 +33,7 @@ class OwnedEntity(models.Model):
         and the owner"""
 
         # print "can_edit: ", self, self.editors.all(), user
+        print("" + self.__class__.__name__)
 
         return (user.is_superuser or
                 user == self.owner or
@@ -44,9 +45,10 @@ class OwnedEntity(models.Model):
 
 
 class URLEntity (OwnedEntity):
-    url = models.URLField(blank=True,
-                          verbose_name="Weblink (URL)",
-                          help_text="Nicht immer sinnvoll, darf leer bleiben.")
+    kontaktdaten = models.CharField(max_length=200,
+                                    blank=True,
+                                    verbose_name="Kontaktdaten",
+                                    help_text="Nicht immer sinnvoll, darf leer bleiben.")
 
     class Meta:
         abstract = True
@@ -94,14 +96,14 @@ class NamedEntity (URLEntity):
 
 
 class DescribedEntity(NamedEntity):
-    beschreibungDe = models.TextField(blank=True,
-                                      verbose_name="Beschreibung",
-                                      help_text=
-                                      u"Ausführliche Beschreibung")
-    beschreibungEn = models.TextField(blank=True,
-                                      verbose_name="Beschreibung (engl.)",
-                                      help_text=
-                                      "Extensive description")
+    # beschreibungDe = models.TextField(blank=True,
+    #                                   verbose_name="Beschreibung",
+    #                                   help_text=
+    #                                   u"Ausführliche Beschreibung")
+    # beschreibungEn = models.TextField(blank=True,
+    #                                   verbose_name="Beschreibung (engl.)",
+    #                                   help_text=
+    #                                   "Extensive description")
 
     class Meta:
         abstract = True
@@ -138,8 +140,8 @@ class SWSEntity(ResponsibleEntity):
                                 verbose_name=u"SWS Übung",
                                 help_text=u"Anzahl SWS für Übungen")
     swsPraktikum = models.IntegerField(default=0,
-                                   verbose_name="Praktikum SWS",
-                                   help_text=u"Anzahl SWS für Praktikumteile")
+                                   verbose_name="SWS Praktikum",
+                                   help_text=u"Anzahl SWS für Praktikum")
     ects = models.IntegerField(default=0,
                                verbose_name="ECTS")
     # swsSonstBeschreibungDe = models.CharField(max_length=300, blank=True,
@@ -166,10 +168,11 @@ class SWSEntity(ResponsibleEntity):
             15*(self.swsVl + self.swsUe + self.swsPraktikum) +
             self.selbststudium))
 
-    sprache = models.CharField(max_length=2,
+    sprache = models.CharField(max_length=5,
                                choices=(('DE', 'Deutsch'),
-                                        ('EN', 'English'), ),
-                               default = 'EN',
+                                        ('EN', 'English'),
+                                        ('Beide', 'Deutsch/English')),
+                               default = 'DE',
                                verbose_name="Sprache",
                                help_text=u"Sprache der Durchführung")
 
@@ -183,7 +186,7 @@ class SWSEntity(ResponsibleEntity):
 # disaply_fields is an attribute picked up by the simple display views
 
 class Lehreinheit(NamedEntity):
-    display_fields = ['nameDe', 'nameEn', 'url', 'editors']
+    display_fields = ['nameDe', 'nameEn', 'kontaktdaten', 'editors']
 
     class Meta:
         verbose_name_plural = "Lehreinheiten (typisch: Institute)"
@@ -196,7 +199,7 @@ class Fachgebiet(NamedEntity):
                                blank=True,
                                verbose_name=u"Kürzel",
                                help_text=u"Kürzel des Fachgebiets")
-    display_fields = ['nameDe', 'nameEn', 'kuerzel', 'url', 'editors']
+    display_fields = ['nameDe', 'nameEn', 'kuerzel', 'kontaktdaten', 'editors']
 
     class Meta:
         verbose_name_plural = "Fachgebiete"
@@ -233,7 +236,7 @@ class NichtfachlicheKompetenz(DescribedEntity):
 
 
 class Lehrender(URLEntity):
-    display_fields = ['name', 'titel', 'url', 'fachgebiet', 'lehreinheit', 'editors']
+    display_fields = ['name', 'titel', 'kontaktdaten', 'fachgebiet', 'lehreinheit', 'editors']
 
     name = models.CharField(max_length=200,
                             help_text="Vor- und Nachname")
@@ -256,31 +259,35 @@ class Lehrender(URLEntity):
 
 class Lehrveranstaltung(SWSEntity):
     display_fields = ['nameDe', 'nameEn',
+                      'lv_nr',
+                      'kontaktzeit',
                       'verantwortlicher',
-                      'beschreibungDe', 'beschreibungEn',
+                      # 'beschreibungDe', 'beschreibungEn',
                       'swsVl', 'swsUe', 'swsPraktikum',
                       'ects',
                       # 'swsSonstBeschreibungDe', 'swsSonstBeschreibungEn',
                       'termin',
                       'zielsemester',
-                      'inhaltDe', 'inhaltEn',
+                      'inhaltDe', #'inhaltEn',
                       'lernergebnisDe', #'lernergebnisEn',
-                      'methodikDe', 'methodikEn',
+                      'voraussetzungen',
+                      'sonstige_hinweise',
                       'vorkenntnisseDe', #'vorkenntnisseEn',
-                      'materialDe', 'materialEn',
-                      'nfk',
-                      'editors'
+                      'literatur', #'materialEn',
+                      'weiterfuehrende',
+                      # 'nfk',
+                      # 'editors'
                   ]
 
-    admin_fields = ["nfk"]
+    # admin_fields = ["nfk"]
 
     lv_nr = models.CharField(max_length=50,
-                             blank=True,
+                             # blank=True,
                              verbose_name="LV-NR",
                              )
-    contact_time_hour = models.CharField(max_length=70,
-                                         blank=True,
-                                         verbose_name='Contact time hour')
+    kontaktzeit = models.CharField(max_length=70,
+                                         # blank=True,
+                                         verbose_name='Kontaktzeit')
     termin = models.CharField(max_length=2,
                               verbose_name="Termin",
                               choices=(('WS', 'Wintersemester'),
@@ -293,13 +300,13 @@ class Lehrveranstaltung(SWSEntity):
 
     # kurzbeschreibungDe = models.TextField(blank=True)
     # kurzbeschreibungEn = models.TextField(blank=True)
-    inhaltDe = models.TextField(blank=True,
+    inhaltDe = models.TextField(#blank=True,
                                 verbose_name="Inhalt",
                                 help_text="Stichpunkte zu Inhalten, wesentliche Kapitel")
-    inhaltEn = models.TextField(blank=True,
-                                verbose_name="Inhalt (engl.)",
-    )
-    lernergebnisDe = models.TextField(blank=True,
+    # inhaltEn = models.TextField(blank=True,
+    #                             verbose_name="Inhalt (engl.)",
+    # )
+    lernergebnisDe = models.TextField(#blank=True,
                                       verbose_name="Lernergebnis und Kompetenzen",
                                       help_text=
                                       "Kompetenzorientierte Beschreibung")
@@ -307,12 +314,11 @@ class Lehrveranstaltung(SWSEntity):
     #                                   verbose_name="Lernergebnis (engl.)",
     #                                   help_text=
     #                                   "Kompetenzorientierte Beschreibung (engl.)")
-    methodikDe = models.TextField(blank=True,
-                                  verbose_name="Methodik",
-                                  help_text="Beschreibung der Lehrmethoden")
-    methodikEn = models.TextField(blank=True,
-                                  verbose_name="Methodik (engl.)",
-                                  help_text="Beschreibung der Lehrmethoden (engl.)")
+    voraussetzungen = models.TextField(blank=True,
+                                       verbose_name="Voraussetzungen für die Teilnahme an der Prüfung",
+                                       help_text=u"Voraussetzungen für die Teilnahme an der Prüfung bzw. die Vergabe von ECTS")
+    sonstige_hinweise = models.TextField(blank=True,
+                                         verbose_name="Sonstige Hinweise")
     vorkenntnisseDe = models.TextField(blank=True,
                                        verbose_name="Empfohlene Vorkenntnisse",
                                        help_text="Sinnvolle Vorkenntnisse")
@@ -321,12 +327,12 @@ class Lehrveranstaltung(SWSEntity):
     #                                    help_text="Sinnvolle Vorkenntnisse (engl.)")
     # kombinationDe = models.TextField(blank=True)
     # kombinationEn = models.TextField(blank=True)
-    materialDe = models.TextField(blank=True,
-                                  verbose_name="Material",
-                                  help_text=u"Materialien für die Vorlesung")
-    materialEn = models.TextField(blank=True,
-                                  verbose_name="Material (engl.)",
-                                  help_text=u"Materialien für die Vorlesung (englische Beschreibung)")
+    literatur = models.TextField(blank=True,
+                                  verbose_name="Literatur",
+                                  help_text=u"Literatur für die Vorlesung")
+    # materialEn = models.TextField(blank=True,
+    #                               verbose_name="Material (engl.)",
+    #                               help_text=u"Materialien für die Vorlesung (englische Beschreibung)")
     # ToDo: check if removing interneBemerkung doesn't cause any problem
     # remove it from parent class
     # don't want to inherit this field
@@ -334,15 +340,23 @@ class Lehrveranstaltung(SWSEntity):
     # https://docs.djangoproject.com/en/1.10/topics/db/models/
     # interneBemerkung = None
 
-    nfk = models.ManyToManyField(
-        NichtfachlicheKompetenz,
-        verbose_name="Nichtfachliche Kompetenz",
-        help_text="Welche nichtfachlichen Kompetenzen werden durch diese Lehrveranstaltung erworben?",
-        blank=True,
-    )
+    # nfk = models.ManyToManyField(
+    #     NichtfachlicheKompetenz,
+    #     verbose_name="Nichtfachliche Kompetenz",
+    #     help_text="Welche nichtfachlichen Kompetenzen werden durch diese Lehrveranstaltung erworben?",
+    #     blank=True,
+    # )
+    #
+    # def nfk_list(self):
+    #     return self.nfk.all()
 
-    def nfk_list(self):
-        return self.nfk.all()
+    # weiterfuehrende = models.ManyToManyField('self',
+    #                                          verbose_name=u"Weiterführende Veranstaltungen",
+    #                                          help_text="Courses that can be taken afterward"
+    #                                          )
+    weiterfuehrende = models.TextField(blank=True,
+                                       verbose_name="Weiterführende Veranstaltungen",
+                                       help_text="Courses that can be taken afterward")
 
     def in_modul(self, modul):
         """A little helper function: check if this
@@ -564,7 +578,7 @@ class FocusArea(ResponsibleEntity):
 
     display_fields = [
         'nameDe', 'nameEn',
-        'url',
+        'kontaktdaten',
         'verantwortlicher',
         'module',
         'beschreibungDe', 'beschreibungEn', 'editors']
@@ -583,7 +597,7 @@ class Studiengang(ResponsibleEntity):
 
     display_fields = [
         'nameDe', 'nameEn',
-        'url',
+        'kontaktdaten',
         'verantwortlicher',
         'module',
         'focusareas',

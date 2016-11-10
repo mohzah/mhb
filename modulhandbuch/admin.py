@@ -306,6 +306,7 @@ class LehrveranstaltungAdmin(OwnedAdmin):
     model = Lehrveranstaltung
     form = select2_modelform(Lehrveranstaltung, attrs={'width': '250px'})
     # exclude = ('interneBemerkung',)   # doesn't work for interneBemerkung
+    # exclude = ('beschreibungDe', 'beschreibungEn')
  
 ####################
 
