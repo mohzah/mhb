@@ -111,7 +111,7 @@ class DescribedEntity(NamedEntity):
 
 class ResponsibleEntity(DescribedEntity):
     verantwortlicher = models.ForeignKey('Lehrender',
-                                         verbose_name="Verantwortlicher Lehrerende(r)",
+                                         verbose_name="Verantwortlicher Lehrender",
                                          help_text=u"Wer ist für die Durchführung/Organisation verantwortlich (muss nicht notwendig selbst durchführen)?")
 
     # note: class name here as a string, to avoid conflicts
@@ -410,52 +410,85 @@ class Lehrveranstaltung(SWSEntity):
 
 
 # class Modul(SWSEntity):
-class Modul(ExaminedEntity):
+class Modul(DescribedEntity):
 
-    display_fields = ['nameDe', 'nameEn',
-                      'verantwortlicher',
-                      'pruefung',
-                      'beschreibungDe', 'beschreibungEn',
-                      'lps', 'pflicht', 'anzahlLvs',
-                      'organisation',
-                      'lernzieleDe', 'lernzieleEn',
-                      'bemerkungDe', 'bemerkungEn',
+    display_fields = ['nameDe',
+                      'nummer', 'workload', 'credits',
+                      'studiensemester', 'haufigkeit',
+                      'dauer', 'lernzieleDe'
+                      'inhalte', 'lehrformen',
+                      'gruppengrosse', 'verwendung',
+                      'empfohlene',
+                      'prufungs_explanation',
+                      'voraussetzungen',
+                      'modulbeauftragter',
+                      # 'beschreibungDe', 'beschreibungEn',
+                      # 'lps',
+                      # 'pflicht', 'anzahlLvs',
+                      # 'organisation',
+                      # 'lernzieleDe', 'lernzieleEn',
+                      # 'bemerkungDe', 'bemerkungEn',
                       'editors'
                   ]
-    lps = models.IntegerField(default=0,
-                              verbose_name="Leistungspunkte",
-                              help_text=
-                              u"Anzahl Leistungspunkte.")
+    nummer = models.CharField(max_length=100,
+                              verbose_name="Nummer")
+    workload = models.IntegerField(default=0,
+                              verbose_name="Workload")
+    credits = models.IntegerField(default=0,
+                              verbose_name="Credits")
+    studiensemester = models.CharField(max_length=100,
+                              verbose_name="Studiensemester")
+    haufigkeit = models.CharField(max_length=100,
+                              verbose_name=u"Häufigkeit des Angebots")
+    dauer = models.CharField(max_length=100,
+                              verbose_name=u"Dauer")
 
-    organisation = models.ForeignKey(Organisationsform,
-                                     verbose_name="Organisationsform des Moduls",
-                                     help_text=u"Art der Durchführung des Moduls")
+    # lps = models.IntegerField(default=0,
+    #                           verbose_name="Leistungspunkte",
+    #                           help_text=
+    #                           u"Anzahl Leistungspunkte.")
 
-    lernzieleDe = models.TextField(blank=True,
-                                   verbose_name="Lernziele",
-                                   help_text=
-                                   "Kurzbeschreibung der erworbenen Fertigkeiten, kompetenzorientiert.")
-    lernzieleEn = models.TextField(blank=True,
-                                   verbose_name="Lernziele (engl.)",
-                                   help_text=
-                                   "Kurzbeschreibung der erworbenen Fertigkeiten, kompetenzorientiert (engl.).")
 
-    bemerkungDe = models.TextField(blank=True,
-                                   verbose_name="Bemerkungen",
-                                   help_text=
-                                   "Sonstige Bemerkungen")
-    bemerkungEn = models.TextField(blank=True,
-                                   verbose_name="Bemerkungen (engl.)",
-                                   help_text=
-                                   "Sonstige Bemerkungen (engl.)")
+    lernzieleDe = models.TextField(verbose_name="Lernergebnisse (learning outcomes) / Kompetenzen")
 
-    pflicht = models.BooleanField(default=False,
-                                  help_text=
-                                  "Ist das eine Pflichtmodul?")
+    # lernzieleEn = models.TextField(blank=True,
+    #                                verbose_name="Lernziele (engl.)",
+    #                                help_text=
+    #                                "Kurzbeschreibung der erworbenen Fertigkeiten, kompetenzorientiert (engl.).")
 
-    anzahlLvs = models.IntegerField(default=0,
-                                    verbose_name="Anzahl Lehrveranstaltungen",
-                                    help_text=u"Wie viele Lehrveranstaltungen müssen in diesem Modul belegt werden in diesem Modul? Zur Berechung des Arbeitsaufwandes notwendig.")
+    inhalte = models.TextField(verbose_name="Inhalte")
+
+    lehrformen = models.CharField(max_length=200,
+                                  verbose_name="Lehrformen")
+
+    gruppengrosse = models.TextField(verbose_name="Gruppengröße")
+
+    verwendung = models.CharField(max_length=200,
+                                  verbose_name="Verwendung des Moduls")
+
+    empfohlene = models.TextField(blank=True,
+                                  verbose_name="Empfohlene Vorkenntniss")
+
+    prufungs_explanation = models.TextField(verbose_name="Prüfungsformen")
+
+    voraussetzungen = models.TextField(blank=True,
+                                       verbose_name="Voraussetzungen",
+                                       help_text=u"Voraussetzungen für die Teilnahme an Prüfungen bzw. die Vergabe von Kreditpunkten")
+
+    # modulbeauftragter = models.ForeignKey('Lehrender',
+    #                                      verbose_name="Modulbeauftragter")
+
+    # organisation = models.ForeignKey(Organisationsform,
+    #                                  verbose_name="Organisationsform des Moduls",
+    #                                  help_text=u"Art der Durchführung des Moduls")
+
+    # pflicht = models.BooleanField(default=False,
+    #                               help_text=
+    #                               "Ist das eine Pflichtmodul?")
+
+    # anzahlLvs = models.IntegerField(default=0,
+    #                                 verbose_name="Anzahl Lehrveranstaltungen",
+    #                                 help_text=u"Wie viele Lehrveranstaltungen müssen in diesem Modul belegt werden in diesem Modul? Zur Berechung des Arbeitsaufwandes notwendig.")
 
     # TODO: If it stays a responsible entity, then we need methods
     # to ask for the SWS both here and in SWSEntity, for uniform access
