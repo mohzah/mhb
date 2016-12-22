@@ -1,0 +1,10 @@
+django-admin-bootstrapped
+django-crispy-forms
+django-extensions
+django-bootstrap3
+django-bootstrap-themes
+django-easy-select2
+django-tables2
+django-autoslug
+django-auth-krb
+
