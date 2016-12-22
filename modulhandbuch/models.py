@@ -56,12 +56,12 @@ class URLEntity (OwnedEntity):
 
 class NamedEntity (URLEntity):
     nameDe = models.CharField(max_length=200,
-                              blank=True,
+                              # blank=True,
                               verbose_name="Name",
                               help_text="Name in Langform")
 
     nameEn = models.CharField(max_length=200,
-                              blank=True,
+                              # blank=True,
                               verbose_name="Name (engl.)",
                               help_text="Name, long version")
 
