@@ -56,6 +56,7 @@ class SimpleListView(ListView):
 
         context['object_list'] = zip(context['object_list'],
                                      editpermissions)
+        print(context['object_list'])
 
         # Add in a QuerySet of all the books
         context['modelname'] = (self.modelname
@@ -223,7 +224,7 @@ class LehrveranstaltungenDetailView(SimpleDetailView):
                 ( "Module " + lvlps.modul.__unicode__(),
                   lvlps.lp,
                   "Anzahl LPs in diesem Modul",
-              )
+                  )
             )
 
         return context
@@ -846,10 +847,11 @@ class CopyView(View):
             messages.add_message(request,
                                  messages.INFO,
                                  'Kopie angelegt, bitte editieren.')
-        except:
+        except Exception as e:
             messages.add_message(request,
                                  messages.ERROR,
                                  "Anlegen der Kopie gescheitert")
+            print e
             return redirect(model+'List')
 
         ##################

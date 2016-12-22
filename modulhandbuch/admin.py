@@ -15,7 +15,6 @@ from easy_select2 import select2_modelform
 
 ############
 
-
 def user_unicode(self):
     return  u'%s (%s, %s)' % (self.username, self.last_name, self.first_name)
 
@@ -26,6 +25,34 @@ admin.site.register(User)
 
 ##############
 
+def restrict_form(uneditable, admin_class, self, request, obj=None, **kwargs):
+    '''
+    helper function to remove the fields that are not editable by Non-owner users from the form
+    :param uneditable: a list of fields uneditable by the editors and only editable by owner or superuser
+    :param admin_class:
+    :param self: ModelAdmin object, an object of the admin_class
+    :param request: HTTP request obj
+    :param obj:
+    :param kwargs:
+    :return:
+    '''
+    try:
+        editors = obj.editors.all()
+    except AttributeError as e:
+        adding_new_obj = True
+
+    if adding_new_obj:
+        # has access to all fields
+        pass
+    elif request.user.is_superuser or request.user == obj.owner:
+        # has access to all fields
+        pass
+    elif request.user in editors:
+        self.fields = [field for field in self.fields if field not in uneditable]
+
+    return super(admin_class, self).get_form(request, obj, **kwargs)
+
+#########################################################
 
 ## a basic admin to add ownership
 
@@ -180,8 +207,8 @@ class OwnedAdmin(admin.ModelAdmin):
 ModulForm = select2_modelform(Modul, attrs={'width': '250px'})
 
 
-
 #########################################################
+
 # inlines that understand whether they should be editable
 
 class OwnedInline(admin.TabularInline):
@@ -277,6 +304,7 @@ class LehrenderAdmin(OwnedAdmin):
     form = select2_modelform(Lehrender, attrs={'width': '250px'})
 
 
+
 class FachgebietAdmin(OwnedAdmin):
     model = Fachgebiet
     form = select2_modelform(Fachgebiet, attrs={'width': '250px'})
@@ -307,7 +335,20 @@ class LehrveranstaltungAdmin(OwnedAdmin):
     form = select2_modelform(Lehrveranstaltung, attrs={'width': '250px'})
     # exclude = ('interneBemerkung',)   # doesn't work for interneBemerkung
     # exclude = ('beschreibungDe', 'beschreibungEn')
- 
+
+    def get_form(self, request, obj=None, **kwargs):
+        uneditable = ['weiterfuehrende']
+        return restrict_form(uneditable, LehrveranstaltungAdmin, self, request, obj, **kwargs)
+        # uneditable = ['weiterfuehrende']
+        # superuser_fields = self.fields
+        # normaluser_fields = [field for field in self.fields if field not in uneditable]
+        # if request.user.is_superuser or obj.owner == request.user:
+        #     self.fields = superuser_fields
+        # elif request.user in obj.editors.all():
+        #     self.fields = normaluser_fields
+        #
+        # return super(LehrveranstaltungAdmin, self).get_form(request, obj, **kwargs)
+
 ####################
 
 admin.site.register(Lehreinheit, LehreinheitAdmin)
