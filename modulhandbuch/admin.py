@@ -38,9 +38,12 @@ def restrict_form(uneditable, admin_class, self, request, obj=None, **kwargs):
     '''
     try:
         editors = obj.editors.all()
+        adding_new_obj = False
     except AttributeError as e:
         adding_new_obj = True
+        print 'exception'
 
+    print 'adding new obj', adding_new_obj
     if adding_new_obj:
         # has access to all fields
         pass
@@ -247,14 +250,6 @@ class ModulLVInline(OwnedInline):
 # patch the classes together
 
 
-class ModulAdmin(OwnedAdmin):
-    form = ModulForm
-    inlines = [ModulLVInline]
-    form = select2_modelform(Modul, attrs={'width': '250px'})
-
-    pass
-
-
 # class FocusAreaModulInline(admin.TabularInline):
 #
 #     model = FocusArea.module.through
@@ -279,8 +274,8 @@ class ModulAdmin(OwnedAdmin):
 
 class StudiengangModuleInline(admin.TabularInline):
     model = Studiengang.module.through
-    verbose_name = "Modul dieses Studiengangs"
-    verbose_name_plural = "Module dieses Studiengangs"
+    verbose_name = "Studiengangs dieses Modul"
+    verbose_name_plural = "Studiengangs dieses Modul"
 
 
 class StudiengangAdmin(OwnedAdmin):
@@ -293,9 +288,19 @@ class StudiengangAdmin(OwnedAdmin):
               'verantwortlicher',
               'startdateien',
              ]
-    inlines = [#StudiengangFocusAreaInline,
-               StudiengangModuleInline]
+    # inlines = [#StudiengangFocusAreaInline,
+    #            StudiengangModuleInline]
     pass
+
+
+class ModulAdmin(OwnedAdmin):
+    form = ModulForm
+    inlines = [ModulLVInline, StudiengangModuleInline]
+    form = select2_modelform(Modul, attrs={'width': '250px'})
+
+    def get_form(self, request, obj=None, **kwargs):
+        uneditable = ['nameEn', 'nameDe', 'nummer', 'workload', 'credits', 'haufigkeit', 'dauer', 'lehrformen', 'gruppengrosse', 'verwendung', 'prufungs_explanation', 'voraussetzungen']
+        return restrict_form(uneditable, LehrveranstaltungAdmin, self, request, obj, **kwargs)
 
 
 class LehrenderAdmin(OwnedAdmin):
@@ -336,7 +341,7 @@ class LehrveranstaltungAdmin(OwnedAdmin):
     # exclude = ('beschreibungDe', 'beschreibungEn')
 
     def get_form(self, request, obj=None, **kwargs):
-        uneditable = ['weiterfuehrende']
+        uneditable = ['nameEn', 'nameDe', 'kontaktzeit', 'termin', 'sprache', 'lv_nr', 'ects', 'swsPraktikum', 'zielsemester', 'verantwortlicher']
         return restrict_form(uneditable, LehrveranstaltungAdmin, self, request, obj, **kwargs)
         # uneditable = ['weiterfuehrende']
         # superuser_fields = self.fields
