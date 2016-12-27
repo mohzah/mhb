@@ -107,8 +107,8 @@ class StudiengangView(SimpleListView):
     model = models.Studiengang
 
 
-class FocusAreaView(SimpleListView):
-    model = models.FocusArea
+# class FocusAreaView(SimpleListView):
+#     model = models.FocusArea
 
 
 class TexDateienView(SimpleListView):
@@ -268,21 +268,21 @@ class ModuleDetailView(SimpleDetailView):
         return context
 
 
-class FocusAreaDetailView(SimpleDetailView):
-    model = models.FocusArea
-
-    def get_context_data(self, **kwargs):
-        context = super(FocusAreaDetailView, self).get_context_data(**kwargs)
-
-        for m in self.object.module.all():
-            context['fields'].append(
-                ('Modul',
-                 m.__unicode__(),
-                 ''
-                )
-            )
-
-        return context
+# class FocusAreaDetailView(SimpleDetailView):
+#     model = models.FocusArea
+#
+#     def get_context_data(self, **kwargs):
+#         context = super(FocusAreaDetailView, self).get_context_data(**kwargs)
+#
+#         for m in self.object.module.all():
+#             context['fields'].append(
+#                 ('Modul',
+#                  m.__unicode__(),
+#                  ''
+#                 )
+#             )
+#
+#         return context
 
 
 class StudiengangDetailView(SimpleDetailView):
@@ -300,13 +300,13 @@ class StudiengangDetailView(SimpleDetailView):
                 )
             )
 
-        for m in self.object.focusareas.all():
-            context['fields'].append(
-                ('Studienrichtung',
-                 m.__unicode__(),
-                 ''
-                )
-            )
+        # for m in self.object.focusareas.all():
+        #     context['fields'].append(
+        #         ('Studienrichtung',
+        #          m.__unicode__(),
+        #          ''
+        #         )
+        #     )
 
         return context
 
@@ -401,15 +401,15 @@ class Generieren(TemplateView):
         # desired studiengang
         # (the "all" versions are just to ease testing)
 
-        _focusareas = models.FocusArea.objects.filter(
-            studiengang__id=studiengang.id)
+        # _focusareas = models.FocusArea.objects.filter(
+        #     studiengang__id=studiengang.id)
 
         # build the Q object for getting all the modules that either
         # - are in the Studiengang itself, mentioned directly, or
         # - are part of one of the studiengang's focusareas
         q = Q(studiengang__id=studiengang.id)
-        for fa in _focusareas:
-            q = q | Q(focusarea=fa)
+        # for fa in _focusareas:
+        #     q = q | Q(focusarea=fa)
 
         _module = models.Modul.objects.filter(q).distinct()
         # old: _module = models.Modul.objects.filter(studiengang__id=studiengang.id)
@@ -453,7 +453,7 @@ class Generieren(TemplateView):
                     organisationsformen=_organisationsformen,
                     lehrende=_lehrende,
                     module=_module,
-                    focusareas=_focusareas,
+                    # focusareas=_focusareas,
                     lehrveranstaltungen=_lehrveranstaltungen,
                     studiengaenge=_studiengaenge,
                     nichtfachlichekompetenzen=_nichtfachlichekompetenzen,
@@ -774,7 +774,7 @@ class LatexCheckView(View):
         classes_to_check = [
             models.Lehrveranstaltung,
             models.Modul,
-            models.FocusArea,
+            # models.FocusArea,
             models.Studiengang,
         ]
 

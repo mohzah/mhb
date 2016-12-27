@@ -222,7 +222,7 @@ class ModulLVInline(OwnedInline):
     # in einem ersten select field, das gart nicht angezeigt
     # werden sollte. Das ist ein killer bug :-(
 
-    # form = select2_modelform(VeranstaltungsLps, attrs={'width': '250px'})
+    # form = select2_modelform(FocusArea, attrs={'width': '250px'})
     fk_name = "modul"
     fields = ['veranstaltung', 'lp', ]
     readonly_fields = ['modul']
@@ -255,28 +255,27 @@ class ModulAdmin(OwnedAdmin):
     pass
 
 
-class FocusAreaModulInline(admin.TabularInline):
-
-    model = FocusArea.module.through
-
-
-class FocusAreaAdmin(OwnedAdmin):
-    # inlines = [FocusAreaModulInline]
-    
-    form = select2_modelform(FocusArea, attrs={'width': '250px'})
-
-    # fields = [ 'url', 'nameDe', 'nameEn',
-    #            'module',
-    #            'beschreibungDe', 'beschreibungEn',
-    #            'verantwortlicher',
-    #            'editors']
-    pass
+# class FocusAreaModulInline(admin.TabularInline):
+#
+#     model = FocusArea.module.through
 
 
-class StudiengangFocusAreaInline(admin.TabularInline):
-    model = Studiengang.focusareas.through
-    verbose_name = "Focus Area dieses Studiengangs"
-    verbose_name_plural = "Focus Areas dieses Studiengangs"
+# class FocusAreaAdmin(OwnedAdmin):
+#     # inlines = [FocusAreaModulInline]
+#
+#     form = select2_modelform(FocusArea, attrs={'width': '250px'})
+#
+#     # fields = [ 'url', 'nameDe', 'nameEn',
+#     #            'module',
+#     #            'beschreibungDe', 'beschreibungEn',
+#     #            'verantwortlicher',
+#     #            'editors']
+#     pass
+
+# class StudiengangFocusAreaInline(admin.TabularInline):
+#     model = Studiengang.focusareas.through
+#     verbose_name = "Focus Area dieses Studiengangs"
+#     verbose_name_plural = "Focus Areas dieses Studiengangs"
 
 class StudiengangModuleInline(admin.TabularInline):
     model = Studiengang.module.through
@@ -294,7 +293,7 @@ class StudiengangAdmin(OwnedAdmin):
               'verantwortlicher',
               'startdateien',
              ]
-    inlines = [StudiengangFocusAreaInline,
+    inlines = [#StudiengangFocusAreaInline,
                StudiengangModuleInline]
     pass
 
@@ -359,7 +358,7 @@ admin.site.register(Organisationsform, OrganisationsformAdmin)
 admin.site.register(NichtfachlicheKompetenz, NichtfachlicheKompetenzAdmin)
 admin.site.register(Lehrveranstaltung, LehrveranstaltungAdmin)
 admin.site.register(Modul, ModulAdmin)
-admin.site.register(FocusArea, FocusAreaAdmin)
+# admin.site.register(FocusArea, FocusAreaAdmin)
 admin.site.register(Studiengang, StudiengangAdmin)
 admin.site.register(TexDateien)
 admin.site.register(VeranstaltungsLps)

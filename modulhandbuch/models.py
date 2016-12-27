@@ -607,23 +607,23 @@ class VeranstaltungsLps(DescribedEntity):
                 self.veranstaltung.__unicode__())
 
 
-class FocusArea(ResponsibleEntity):
-
-    display_fields = [
-        'nameDe', 'nameEn',
-        'kontaktdaten',
-        'verantwortlicher',
-        'module',
-        'beschreibungDe', 'beschreibungEn', 'editors']
-
-    admin_fields = ['module', ]
-
-    module = models.ManyToManyField(Modul)
-
-    class Meta:
-        verbose_name = "Studienrichtung  (Focus Area)"
-        verbose_name_plural = "Studienrichtungen  (Focus Areas)"
-        ordering = ["nameDe", ]
+# class FocusArea(ResponsibleEntity):
+#
+#     display_fields = [
+#         'nameDe', 'nameEn',
+#         'kontaktdaten',
+#         'verantwortlicher',
+#         'module',
+#         'beschreibungDe', 'beschreibungEn', 'editors']
+#
+#     admin_fields = ['module', ]
+#
+#     module = models.ManyToManyField(Modul)
+#
+#     class Meta:
+#         verbose_name = "Studienrichtung  (Focus Area)"
+#         verbose_name_plural = "Studienrichtungen  (Focus Areas)"
+#         ordering = ["nameDe", ]
 
 
 class Studiengang(ResponsibleEntity):
@@ -633,14 +633,14 @@ class Studiengang(ResponsibleEntity):
         'kontaktdaten',
         'verantwortlicher',
         'module',
-        'focusareas',
+        # 'focusareas',
         'startdateien',
         'beschreibungDe', 'beschreibungEn', 'editors']
 
     admin_fields = ['startdateien', ]
 
     module = models.ManyToManyField(Modul)
-    focusareas = models.ManyToManyField(FocusArea)
+    # focusareas = models.ManyToManyField(FocusArea)
     startdateien = models.ManyToManyField("TexDateien",
                                           verbose_name="Benutzte Dateien",
                                           help_text=u"Welche Tex-Dateien werden für dieesen Studiengang benötigt?")

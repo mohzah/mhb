@@ -150,12 +150,12 @@ urlpatterns = [
         active_and_login_required(views.StudiengangDetailView.as_view()),
         name="studiengangDetail"),
 
-    url(r'/focusarea$',
-        active_and_login_required(views.FocusAreaView.as_view()),
-        name="focusareaList"),
-    url(r'/focusarea/(?P<pk>[0-9]+)$',
-        active_and_login_required(views.FocusAreaDetailView.as_view()),
-        name="focusareaDetail"),
+    # url(r'/focusarea$',
+    #     active_and_login_required(views.FocusAreaView.as_view()),
+    #     name="focusareaList"),
+    # url(r'/focusarea/(?P<pk>[0-9]+)$',
+    #     active_and_login_required(views.FocusAreaDetailView.as_view()),
+    #     name="focusareaDetail"),
 
     url(r'/texdatei$',
         active_and_login_required(views.TexDateienView.as_view()),
