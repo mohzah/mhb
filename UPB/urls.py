@@ -44,8 +44,8 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/login/$', 'django_auth_krb.views.krb_login'),
     url(r'^accounts/logout/$', 'django_auth_krb.views.krb_logout'),
-    url(r'^accounts/login/$', auth_views.login),
-    url(r'^accounts/logout/$', auth_views.logout),
+    # url(r'^accounts/login/$', auth_views.login),
+    # url(r'^accounts/logout/$', auth_views.logout),
     url(r'^$',
         active_and_login_required(
             TemplateView.as_view (template_name='home.html')),
