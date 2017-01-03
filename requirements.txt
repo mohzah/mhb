@@ -7,4 +7,5 @@ django-easy-select2
 django-tables2
 django-autoslug
 django-auth-krb
+jinja2
 
