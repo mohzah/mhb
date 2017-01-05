@@ -120,7 +120,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = "/var/www/mysite/static/"
 # theme support not clear, this does not do anything; which "URL" is necessary here? 
 # BOOTSTRAP3 = {'theme_url': "http://bootswatch.com/cosmo/"}
 BOOTSTRAP3 = {'include_jquery': True}
