@@ -65,7 +65,7 @@ KRB5_REALM = "UNI-PADERBORN.DE"
 AUTHENTICATION_BACKENDS = (
     # if first one fails, Django tries the next backend
     # If a backend raises a PermissionDenied exception, authentication will immediately fail.
-    # 'UPB.kerbauth.KerbAuth',
+    'UPB.kerbauth.KerbAuth',
     'django_auth_krb.backends.KrbBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
