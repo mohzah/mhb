@@ -3,12 +3,23 @@ from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
 
 import kerberos
 import getent
 
 
 class KerbAuth(ModelBackend):
+
+    def __init__(self):
+        self.group_name = "lehrender"
+        group, created = Group.objects.get_or_create(name=self.group_name)
+        if created:
+            permissions = Permission.objects.all()
+            for p in permissions:
+                if 'modulhandbuch' in str(p):
+                    group.permissions.add(p)
+        super(KerbAuth, self).__init__()
 
     def authenticate(self, username=None, password=None, **kwargs):
         UserModel = get_user_model()
@@ -54,7 +65,7 @@ class KerbAuth(ModelBackend):
 
             try:
                 # have to set a reasonable default group
-                g = Group.objects.get(name="lehrender")
+                g = Group.objects.get(name=self.group_name)
                 user.groups.add(g)
             except:
                 # print "adding user to group did not work"
