@@ -300,7 +300,7 @@ class ModulAdmin(OwnedAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         uneditable = ['nameEn', 'nameDe', 'nummer', 'workload', 'credits', 'haufigkeit', 'dauer', 'lehrformen', 'gruppengrosse', 'verwendung', 'prufungs_explanation', 'voraussetzungen']
-        return restrict_form(uneditable, LehrveranstaltungAdmin, self, request, obj, **kwargs)
+        return restrict_form(uneditable, ModulAdmin, self, request, obj, **kwargs)
 
 
 class LehrenderAdmin(OwnedAdmin):
