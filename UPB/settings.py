@@ -66,8 +66,10 @@ AUTHENTICATION_BACKENDS = (
     # if first one fails, Django tries the next backend
     # If a backend raises a PermissionDenied exception, authentication will immediately fail.
     'UPB.kerbauth.KerbAuth',
-    'django_auth_krb.backends.KrbBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    # if following backends are enabled, then if first fails followings will
+    # authenticate unauthorizid users
+    # 'django_auth_krb.backends.KrbBackend',
+    # 'django.contrib.auth.backends.ModelBackend',
 )
 
 ROOT_URLCONF = 'UPB.urls'

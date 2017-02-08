@@ -7,6 +7,7 @@ from django.contrib.auth.models import Permission
 
 import kerberos
 import getent
+import re
 
 
 class KerbAuth(ModelBackend):
@@ -37,6 +38,13 @@ class KerbAuth(ModelBackend):
 
         # print "kerberos succeeded"
 
+        with open('/etc/apache2/htgroup') as f:
+            text = f.read()
+            pattern = '^modulhandbuch-mb:.*$'
+            match = re.search(pattern, text, re.MULTILINE)
+            if match:
+                if not username + '@UNI-PADERBORN.DE' in match.group(0):
+                    return None
         # TODO: think how to better integrate this with the
         # django permission system. depending on group
         # membership, assign different permissions.
