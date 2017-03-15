@@ -410,6 +410,8 @@ class Lehrveranstaltung(SWSEntity):
                 veranstaltung=self,
                 modul=x.modul,
                 lp=x.lp,
+                prufungsleistung = x.prufungsleistung,
+                studienleistung = x.studienleistung
             )
             tmp.save()
 
@@ -626,6 +628,37 @@ class Modul(DescribedEntity):
         ordering = ['nameDe', ]
 
 
+class Prufungsleistung(OwnedEntity):
+    prufungsform = models.CharField(blank=True,
+                                    max_length=60,
+                                    verbose_name=u'Prüfungsform')
+    dauer = models.CharField(blank=True,
+                             max_length=60,
+                             verbose_name="Dauer bzw Umfang")
+    gewichtung = models.IntegerField(default=50,
+                                     verbose_name=u"Gewichtung für die Modulnote")
+
+    def __unicode__(self):
+        return '{:.10} - {:.10} - {}%'.format(self.prufungsform, self.dauer, self.gewichtung)
+
+
+class Studienleistung(OwnedEntity):
+    form = models.CharField(blank=True,
+                            max_length=40,
+                            verbose_name='Form')
+    dauer = models.CharField(blank=True,
+                             max_length=25,
+                             verbose_name='Dauer bzw Umfang')
+    sl_qt = models.CharField(max_length=10,
+                             verbose_name='SL / QT',
+                             choices=(('SL', 'SL'),
+                                      ('QT', 'QT'))
+                             )
+
+    def __unicode__(self):
+        return '{:.10} {:.10} {}'.format(self.form, self.dauer, self.sl_qt)
+
+
 class VeranstaltungsLps(DescribedEntity):
 
     lp = models.IntegerField(default=0,
@@ -634,6 +667,8 @@ class VeranstaltungsLps(DescribedEntity):
                              u"Anzahl LPs für diese Lehrveranstaltung in diesem Modul")
     veranstaltung = models.ForeignKey(Lehrveranstaltung)
     modul = models.ForeignKey(Modul)
+    prufungsleistung = models.ForeignKey(Prufungsleistung)
+    studienleistung = models.ForeignKey(Studienleistung)
 
     class Meta:
         verbose_name = "LP pro Veranstaltung"

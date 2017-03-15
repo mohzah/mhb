@@ -227,7 +227,7 @@ class ModulLVInline(OwnedInline):
 
     # form = select2_modelform(FocusArea, attrs={'width': '250px'})
     fk_name = "modul"
-    fields = ['veranstaltung', 'lp', ]
+    fields = ['veranstaltung', 'lp', 'prufungsleistung', 'studienleistung']
     readonly_fields = ['modul']
     verbose_name = "Lehrveranstaltung (und LP) in diesem Modul"
     verbose_name_plural = "Lehrveranstaltungen (und LPs) in diesem Modul"
@@ -276,6 +276,18 @@ class StudiengangModuleInline(admin.TabularInline):
     model = Studiengang.module.through
     verbose_name = "Studiengangs dieses Modul"
     verbose_name_plural = "Studiengangs dieses Modul"
+
+
+class PrufungsleistungAdmin(OwnedAdmin):
+    model = Prufungsleistung
+    verbose_name = "Prufungsleistung"
+    form = select2_modelform(Prufungsleistung, attrs={'width': '250px'})
+
+
+class StudienleistungAdmin(OwnedAdmin):
+    model = Studienleistung
+    verbose_name = 'Studienleistung / qualifiziere Teilnahme'
+    form = select2_modelform(Studienleistung, attrs={'width': '250px'})
 
 
 class StudiengangAdmin(OwnedAdmin):
@@ -362,8 +374,12 @@ admin.site.register(Pruefungsform, PruefungsformAdmin)
 admin.site.register(Organisationsform, OrganisationsformAdmin)
 admin.site.register(NichtfachlicheKompetenz, NichtfachlicheKompetenzAdmin)
 admin.site.register(Lehrveranstaltung, LehrveranstaltungAdmin)
+admin.site.register(Prufungsleistung, PrufungsleistungAdmin)
+admin.site.register(Studienleistung, StudienleistungAdmin)
+# admin.site.register(Prufungsleistung)
 admin.site.register(Modul, ModulAdmin)
 # admin.site.register(FocusArea, FocusAreaAdmin)
 admin.site.register(Studiengang, StudiengangAdmin)
 admin.site.register(TexDateien)
 admin.site.register(VeranstaltungsLps)
+
