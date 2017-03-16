@@ -353,7 +353,8 @@ class LehrveranstaltungAdmin(OwnedAdmin):
     # exclude = ('beschreibungDe', 'beschreibungEn')
 
     def get_form(self, request, obj=None, **kwargs):
-        uneditable = ['nameEn', 'nameDe', 'kontaktzeit', 'termin', 'sprache', 'lv_nr', 'ects', 'swsPraktikum', 'zielsemester', 'verantwortlicher']
+        uneditable = ['nameEn', 'nameDe', 'kontaktzeit', 'termin', 'sprache', 'lv_nr', 'ects', 'swsPraktikum',
+                      'zielsemester', 'verantwortlicher', 'englishsprachige']
         return restrict_form(uneditable, LehrveranstaltungAdmin, self, request, obj, **kwargs)
         # uneditable = ['weiterfuehrende']
         # superuser_fields = self.fields

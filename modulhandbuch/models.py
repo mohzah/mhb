@@ -268,6 +268,7 @@ class Lehrveranstaltung(SWSEntity):
                       # 'swsSonstBeschreibungDe', 'swsSonstBeschreibungEn',
                       'termin',
                       'zielsemester',
+                      'englishsprachige',
                       'inhaltDe', #'inhaltEn',
                       'lernergebnisDe', #'lernergebnisEn',
                       'voraussetzungen',
@@ -300,6 +301,8 @@ class Lehrveranstaltung(SWSEntity):
     zielsemester = models.IntegerField(default=0,
                                        help_text="Sollsemester, 0: beliebig")
 
+    englishsprachige = models.BooleanField(default=False,
+                                           verbose_name="Aufnahme in die liste englishsprachige")
     # kurzbeschreibungDe = models.TextField(blank=True)
     # kurzbeschreibungEn = models.TextField(blank=True)
     inhaltDe = models.TextField(#blank=True,
