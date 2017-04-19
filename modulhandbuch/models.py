@@ -276,8 +276,9 @@ class Lehrveranstaltung(SWSEntity):
                       'vorkenntnisseDe', #'vorkenntnisseEn',
                       'literatur', #'materialEn',
                       'weiterfuehrende',
+                      'lehrform',
                       'gruppengrosse',
-                      'status',
+                      # 'status',
                       # 'nfk',
                       # 'editors'
                   ]
@@ -363,13 +364,17 @@ class Lehrveranstaltung(SWSEntity):
                                        verbose_name="Weiterführende Veranstaltungen",
                                        help_text="Courses that can be taken afterward")
 
-    gruppengrosse = models.IntegerField(verbose_name="Gruppengröße (TN)")
+    lehrform = models.CharField(max_length=200,
+                                  verbose_name="Lehrform")
 
-    status = models.CharField(blank=True,
-                              max_length=10,
-                              choices=(('P', 'P'),
-                                       ('PW', 'PW')),
-                              help_text='Status (P/WP)')
+    gruppengrosse = models.IntegerField(blank=False,
+                                        verbose_name="Gruppengröße (TN)")
+
+    # status = models.CharField(blank=True,
+    #                           max_length=10,
+    #                           choices=(('P', 'P'),
+    #                                    ('PW', 'WP')),
+    #                           help_text='Status (P/WP)')
 
     def in_modul(self, modul):
         """A little helper function: check if this
@@ -431,10 +436,10 @@ class Modul(DescribedEntity):
                       'nummer', 'workload', 'credits',
                       'studiensemester', 'haufigkeit',
                       'dauer', 'lernzieleDe'
-                      'inhalte', 'lehrformen',
+                      'inhalte', # 'lehrformen',
                       'gruppengrosse', 'verwendung',
-                      'empfohlene',
-                      'prufungs_explanation',
+                      # 'empfohlene',
+                      # 'prufungs_explanation',
                       'voraussetzungen',
                       'voraussetzungen_vergabe',
                       'modulbeauftragter',
@@ -463,7 +468,7 @@ class Modul(DescribedEntity):
     Turnus = models.CharField(max_length=100,
                               verbose_name="Turnus")
     dauer = models.CharField(max_length=100,
-                              verbose_name=u"Dauer")
+                              verbose_name=u"Dauer (in Sem.)")
 
     # lps = models.IntegerField(default=0,
     #                           verbose_name="Leistungspunkte",
@@ -480,42 +485,41 @@ class Modul(DescribedEntity):
 
     inhalte = models.TextField(verbose_name="Inhalte")
 
-    lehrformen = models.CharField(max_length=200,
-                                  verbose_name="Lehrformen")
+    # lehrformen = models.CharField(max_length=200,
+    #                               verbose_name="Lehrformen")
 
     # gruppengrosse = models.TextField(verbose_name="Gruppengröße")
 
     verwendung = models.CharField(max_length=200,
-                                  verbose_name="Verwendung des Moduls")
+                                  verbose_name=u"Verwendung des Moduls in anderen Studiengängen")
 
-    empfohlene = models.TextField(blank=True,
-                                  verbose_name="Empfohlene Vorkenntniss")
+    # empfohlene = models.TextField(blank=True,
+    #                               verbose_name="Empfohlene Vorkenntniss")
 
-    prufungs_explanation = models.TextField(verbose_name=u"Prüfungsformen")
+    # prufungs_explanation = models.TextField(verbose_name=u"Prüfungsformen")
 
-    voraussetzungen = models.TextField(blank=True,
+    voraussetzungen = models.TextField(blank=False,
                                        verbose_name=u"Voraussetzungen für die Teilnahme an Prüfungen")
 
-    voraussetzungen_vergabe = models.TextField(blank=True,
+    voraussetzungen_vergabe = models.TextField(blank=False,
                                        verbose_name=u"Voraussetzungen für die Vergabe von Credits")
 
-    wahlmoeglichkeiten = models.TextField(blank=True,
-                                          verbose_name='Wahlmoeglichkeiten',
-                                          help_text=u'Wahlmöglichkeiten innerhalb des Moduls')
+    wahlmoeglichkeiten = models.TextField(blank=False,
+                                          verbose_name=u'Wahlmöglichkeiten innerhalb des Moduls')
 
     teilnahmevoraussetzungen = models.TextField(verbose_name='Teilnahmevoraussetzungen')
 
     pruefungsleistung = models.CharField(blank=True,
                                          max_length=35,
                                          verbose_name=u'Prüfungsleistung',
-                                         choices=(('MAP', 'Modulabschlussprufung'),
-                                                  ('MP', 'Modulprufung'),
-                                                  ('MTP', 'Modulteilprufungen')))
+                                         choices=((u'Modulabschlussprüfung (MAP)', u'Modulabschlussprüfung '),
+                                                  ('Modulprufung (MP)', 'Modulprufung'),
+                                                  ('Modulteilprufungen (MTP)', 'Modulteilprufungen')))
 
     gewichtung = models.TextField(blank=True,
                                   verbose_name=u'Gewichtung für Gesamtnote')
 
-    sonstige = models.TextField(blank=True,
+    sonstige = models.TextField(blank=False,
                                 verbose_name='Sonstige Hinweise')
 
     # modulbeauftragter = models.ForeignKey('Lehrender',
@@ -659,7 +663,7 @@ class Studienleistung(OwnedEntity):
                              )
 
     def __unicode__(self):
-        return '{:.10} {:.10} {}'.format(self.form, self.dauer, self.sl_qt)
+        return 'Form:{:.50}/Dauer u. Unfang:{:.50}/Studienleistung{}'.format(self.form, self.dauer, self.sl_qt)
 
 
 class VeranstaltungsLps(DescribedEntity):
@@ -672,6 +676,11 @@ class VeranstaltungsLps(DescribedEntity):
     modul = models.ForeignKey(Modul)
     prufungsleistung = models.ForeignKey(Prufungsleistung)
     studienleistung = models.ForeignKey(Studienleistung)
+    status = models.CharField(max_length=5,
+                              choices=(('P', 'P'),
+                                       ('PW', 'WP')),
+                              help_text='Status (P/WP)')
+
 
     class Meta:
         verbose_name = "LP pro Veranstaltung"

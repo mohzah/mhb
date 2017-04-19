@@ -227,7 +227,7 @@ class ModulLVInline(OwnedInline):
 
     # form = select2_modelform(FocusArea, attrs={'width': '250px'})
     fk_name = "modul"
-    fields = ['veranstaltung', 'lp', 'prufungsleistung', 'studienleistung']
+    fields = ['veranstaltung', 'lp', 'prufungsleistung', 'studienleistung', 'status']
     readonly_fields = ['modul']
     verbose_name = "Lehrveranstaltung (und LP) in diesem Modul"
     verbose_name_plural = "Lehrveranstaltungen (und LPs) in diesem Modul"
@@ -311,7 +311,7 @@ class ModulAdmin(OwnedAdmin):
     form = select2_modelform(Modul, attrs={'width': '250px'})
 
     def get_form(self, request, obj=None, **kwargs):
-        uneditable = ['nameEn', 'nameDe', 'nummer', 'workload', 'credits', 'haufigkeit', 'dauer', 'lehrformen', 'gruppengrosse', 'verwendung', 'prufungs_explanation', 'voraussetzungen']
+        uneditable = ['nameEn', 'nameDe', 'nummer', 'workload', 'credits', 'haufigkeit', 'dauer', 'gruppengrosse', 'verwendung', 'voraussetzungen']
         return restrict_form(uneditable, ModulAdmin, self, request, obj, **kwargs)
 
 
