@@ -303,7 +303,7 @@ class Lehrveranstaltung(SWSEntity):
                                        help_text="Sollsemester, 0: beliebig")
 
     englishsprachige = models.BooleanField(default=False,
-                                           verbose_name="Aufnahme in die liste englishsprachige")
+                                           verbose_name="Aufnahme in die Liste englischsprachiger Veranstaltungen")
     # kurzbeschreibungDe = models.TextField(blank=True)
     # kurzbeschreibungEn = models.TextField(blank=True)
     inhaltDe = models.TextField(#blank=True,
@@ -454,7 +454,8 @@ class Modul(DescribedEntity):
                       'teilnahmevoraussetzungen',
                       'pruefungsleistung',
                       'gewichtung',
-                      'sonstige'
+                      'sonstige',
+                      'above_table',
                   ]
 
     nummer = models.CharField(max_length=100,
@@ -522,8 +523,11 @@ class Modul(DescribedEntity):
     sonstige = models.TextField(blank=False,
                                 verbose_name='Sonstige Hinweise')
 
-    # modulbeauftragter = models.ForeignKey('Lehrender',
-    #                                      verbose_name="Modulbeauftragter")
+    above_table = models.TextField(blank=True,
+                                   help_text="Text comming above module table in PDF")
+
+    modulbeauftragter = models.ForeignKey('Lehrender',
+                                         verbose_name="Modulbeauftragter")
 
     # organisation = models.ForeignKey(Organisationsform,
     #                                  verbose_name="Organisationsform des Moduls",
@@ -663,7 +667,7 @@ class Studienleistung(OwnedEntity):
                              )
 
     def __unicode__(self):
-        return 'Form:{:.50}/Dauer u. Unfang:{:.50}/Studienleistung{}'.format(self.form, self.dauer, self.sl_qt)
+        return '{:.50} / {:.50} / {}'.format(self.form, self.dauer, self.sl_qt)
 
 
 class VeranstaltungsLps(DescribedEntity):
@@ -675,7 +679,7 @@ class VeranstaltungsLps(DescribedEntity):
     veranstaltung = models.ForeignKey(Lehrveranstaltung)
     modul = models.ForeignKey(Modul)
     prufungsleistung = models.ForeignKey(Prufungsleistung)
-    studienleistung = models.ForeignKey(Studienleistung)
+    studienleistung = models.ForeignKey(Studienleistung, verbose_name="Form / Dauer u. Umfang / Studienleistung")
     status = models.CharField(max_length=5,
                               choices=(('P', 'P'),
                                        ('PW', 'WP')),
