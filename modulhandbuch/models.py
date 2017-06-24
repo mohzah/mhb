@@ -33,7 +33,7 @@ class OwnedEntity(models.Model):
         and the owner"""
 
         # print "can_edit: ", self, self.editors.all(), user
-        print("" + self.__class__.__name__)
+        # print("" + self.__class__.__name__)
 
         return (user.is_superuser or
                 user == self.owner or
@@ -419,7 +419,7 @@ class Lehrveranstaltung(SWSEntity):
                 modul=x.modul,
                 lp=x.lp,
                 prufungsleistung = x.prufungsleistung,
-                studienleistung = x.studienleistung
+                # studienleistung = x.studienleistung
             )
             tmp.save()
 
@@ -653,21 +653,21 @@ class Prufungsleistung(OwnedEntity):
         return '{:.10} - {:.10} - {}%'.format(self.prufungsform, self.dauer, self.gewichtung)
 
 
-class Studienleistung(OwnedEntity):
-    form = models.CharField(blank=True,
-                            max_length=40,
-                            verbose_name='Form')
-    dauer = models.CharField(blank=True,
-                             max_length=25,
-                             verbose_name='Dauer bzw Umfang')
-    sl_qt = models.CharField(max_length=10,
-                             verbose_name='SL / QT',
-                             choices=(('SL', 'SL'),
-                                      ('QT', 'QT'))
-                             )
-
-    def __unicode__(self):
-        return '{:.50} / {:.50} / {}'.format(self.form, self.dauer, self.sl_qt)
+# class Studienleistung(OwnedEntity):
+#     form = models.CharField(blank=True,
+#                             max_length=40,
+#                             verbose_name='Form')
+#     dauer = models.CharField(blank=True,
+#                              max_length=25,
+#                              verbose_name='Dauer bzw Umfang')
+#     sl_qt = models.CharField(max_length=10,
+#                              verbose_name='SL / QT',
+#                              choices=(('SL', 'SL'),
+#                                       ('QT', 'QT'))
+#                              )
+#
+#     def __unicode__(self):
+#         return '{:.50} / {:.50} / {}'.format(self.form, self.dauer, self.sl_qt)
 
 
 class VeranstaltungsLps(DescribedEntity):
@@ -678,8 +678,20 @@ class VeranstaltungsLps(DescribedEntity):
                              u"Anzahl LPs für diese Lehrveranstaltung in diesem Modul")
     veranstaltung = models.ForeignKey(Lehrveranstaltung)
     modul = models.ForeignKey(Modul)
-    prufungsleistung = models.ForeignKey(Prufungsleistung)
-    studienleistung = models.ForeignKey(Studienleistung, verbose_name="Form / Dauer u. Umfang / Studienleistung")
+    prufungsleistung = models.ForeignKey(Prufungsleistung,
+                                         verbose_name=u"Prüfungsleistung")
+    form = models.CharField(blank=True,
+                            max_length=40,
+                            verbose_name='Form')
+    dauer_umfang = models.CharField(blank=True,
+                             max_length=25,
+                             verbose_name='Dauer bzw Umfang')
+    sl_qt = models.CharField(max_length=10,
+                             verbose_name='SL / QT',
+                             choices=(('SL', 'SL'),
+                                      ('QT', 'QT'))
+                             )
+    # studienleistung = models.ForeignKey(Studienleistung, verbose_name="Form / Dauer u. Umfang / Studienleistung")
     status = models.CharField(max_length=5,
                               choices=(('P', 'P'),
                                        ('PW', 'WP')),

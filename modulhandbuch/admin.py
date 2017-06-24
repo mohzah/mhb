@@ -43,7 +43,7 @@ def restrict_form(uneditable, admin_class, self, request, obj=None, **kwargs):
         adding_new_obj = True
         print 'exception'
 
-    print 'adding new obj', adding_new_obj
+    # print 'adding new obj', adding_new_obj
     if adding_new_obj:
         # has access to all fields
         pass
@@ -227,7 +227,8 @@ class ModulLVInline(OwnedInline):
 
     # form = select2_modelform(FocusArea, attrs={'width': '250px'})
     fk_name = "modul"
-    fields = ['veranstaltung', 'lp', 'prufungsleistung', 'studienleistung', 'status']
+    # fields = ['veranstaltung', 'lp', 'prufungsleistung', 'studienleistung', 'status']
+    fields = ['veranstaltung', 'lp', 'prufungsleistung', 'status', 'form', 'dauer_umfang', 'sl_qt']
     readonly_fields = ['modul']
     verbose_name = "Lehrveranstaltung (und LP) in diesem Modul"
     verbose_name_plural = "Lehrveranstaltungen (und LPs) in diesem Modul"
@@ -280,14 +281,14 @@ class StudiengangModuleInline(admin.TabularInline):
 
 class PrufungsleistungAdmin(OwnedAdmin):
     model = Prufungsleistung
-    verbose_name = "Prufungsleistung"
+    verbose_name = u"Prüfungsleistung"
     form = select2_modelform(Prufungsleistung, attrs={'width': '250px'})
 
 
-class StudienleistungAdmin(OwnedAdmin):
-    model = Studienleistung
-    verbose_name = 'Studienleistung / qualifiziere Teilnahme'
-    form = select2_modelform(Studienleistung, attrs={'width': '250px'})
+# class StudienleistungAdmin(OwnedAdmin):
+#     model = Studienleistung
+#     verbose_name = 'Studienleistung / qualifiziere Teilnahme'
+#     form = select2_modelform(Studienleistung, attrs={'width': '250px'})
 
 
 class StudiengangAdmin(OwnedAdmin):
@@ -376,11 +377,10 @@ admin.site.register(Organisationsform, OrganisationsformAdmin)
 admin.site.register(NichtfachlicheKompetenz, NichtfachlicheKompetenzAdmin)
 admin.site.register(Lehrveranstaltung, LehrveranstaltungAdmin)
 admin.site.register(Prufungsleistung, PrufungsleistungAdmin)
-admin.site.register(Studienleistung, StudienleistungAdmin)
+# admin.site.register(Studienleistung, StudienleistungAdmin)
 # admin.site.register(Prufungsleistung)
 admin.site.register(Modul, ModulAdmin)
 # admin.site.register(FocusArea, FocusAreaAdmin)
 admin.site.register(Studiengang, StudiengangAdmin)
 admin.site.register(TexDateien)
 admin.site.register(VeranstaltungsLps)
-
