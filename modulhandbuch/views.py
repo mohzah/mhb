@@ -114,6 +114,10 @@ class StudiengangView(SimpleListView):
 class TexDateienView(SimpleListView):
     model = models.TexDateien
 
+
+class ModuleTypeView(SimpleListView):
+    model = models.Moduletype
+
 #########################################
 # Views for the detailed disaply of an entry
 
@@ -244,6 +248,10 @@ class PruefungsformDetailView(SimpleDetailView):
 
 class TexDateienDetailView(SimpleDetailView):
     model = models.TexDateien
+
+
+class ModuleTypeDetailView(SimpleDetailView):
+    model = models.Moduletype
 
 
 class ModuleDetailView(SimpleDetailView):
@@ -879,3 +887,5 @@ class CopyView(View):
         # done, redirect to the admin for further editing:
         return redirect("/admin/modulhandbuch/{}/{}"
                         .format(model, o.pk))
+
+

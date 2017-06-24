@@ -753,6 +753,13 @@ class Studiengang(ResponsibleEntity):
         ordering = ["nameDe", ]
 
 
+class Moduletype(models.Model):
+    type_of_module = models.CharField(max_length=100)
+    relevant_studiengang = models.ForeignKey('Studiengang')
+    class Meta:
+        verbose_name = "Module Type"
+        verbose_name_plural = "Module Types"
+
 class TexDateien (models.Model):
     # add description, make filename unique!
     filename = models.CharField(max_length=100)

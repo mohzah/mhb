@@ -164,6 +164,13 @@ urlpatterns = [
         active_and_login_required(views.TexDateienDetailView.as_view()),
         name="texdateienDetail"),
 
+    url(r'/moduletype$',
+        active_and_login_required(views.ModuleTypeView.as_view()),
+        name="moduletypeList"),
+    url(r'/moduletype/(?P<pk>[0-9]+)$',
+        active_and_login_required(views.ModuleTypeDetailView.as_view()),
+        name="moduletypeDetail"),
+
     url(r'/abbildung$',
         active_and_login_required(views.AbbildungenView.as_view()),
         name="abbildungenList"),
