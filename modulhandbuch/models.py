@@ -456,6 +456,7 @@ class Modul(DescribedEntity):
                       'gewichtung',
                       'sonstige',
                       'above_table',
+                      'module_type',
                   ]
 
     nummer = models.CharField(max_length=100,
@@ -529,6 +530,7 @@ class Modul(DescribedEntity):
     modulbeauftragter = models.ForeignKey('Lehrender',
                                          verbose_name="Modulbeauftragter")
 
+    module_type = models.ForeignKey('Moduletype')
     # organisation = models.ForeignKey(Organisationsform,
     #                                  verbose_name="Organisationsform des Moduls",
     #                                  help_text=u"Art der Durchführung des Moduls")
@@ -759,6 +761,9 @@ class Moduletype(models.Model):
     class Meta:
         verbose_name = "Module Type"
         verbose_name_plural = "Module Types"
+
+    def __unicode__(self):
+        return self.type_of_module
 
 class TexDateien (models.Model):
     # add description, make filename unique!
