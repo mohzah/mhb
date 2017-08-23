@@ -69,7 +69,7 @@ AUTHENTICATION_BACKENDS = (
     # if following backends are enabled, then if first fails followings will
     # authenticate unauthorizid users
     # 'django_auth_krb.backends.KrbBackend',
-    # 'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 ROOT_URLCONF = 'UPB.urls'
