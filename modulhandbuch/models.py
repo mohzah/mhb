@@ -185,25 +185,26 @@ class SWSEntity(ResponsibleEntity):
 
 # disaply_fields is an attribute picked up by the simple display views
 
-class Lehreinheit(NamedEntity):
-    display_fields = ['nameDe', 'nameEn', 'kontaktdaten', 'editors']
+# deleted, not needed
+# class Lehreinheit(NamedEntity):
+#     display_fields = ['nameDe', 'nameEn', 'kontaktdaten', 'editors']
+#
+#     class Meta:
+#         verbose_name_plural = "Lehreinheiten (typisch: Institute)"
+#         verbose_name = "Lehreinheit (typisch: Institut)"
+#         ordering = ["nameDe", ]
 
-    class Meta:
-        verbose_name_plural = "Lehreinheiten (typisch: Institute)"
-        verbose_name = "Lehreinheit (typisch: Institut)"
-        ordering = ["nameDe", ]
-
-class Fachgebiet(NamedEntity):
+class Lehrstuhl(NamedEntity):
 
     kuerzel = models.CharField(max_length=10,
                                blank=True,
                                verbose_name=u"Kürzel",
-                               help_text=u"Kürzel des Fachgebiets")
+                               help_text=u"Kürzel des Lehrstühle")
     display_fields = ['nameDe', 'nameEn', 'kuerzel', 'kontaktdaten', 'editors']
 
     class Meta:
-        verbose_name_plural = "Fachgebiete"
-        verbose_name = "Fachgebiet"
+        verbose_name_plural = "Lehrstühle"
+        verbose_name = "Lehrstuhl"
         ordering = ["nameDe", ]
 
 
@@ -236,17 +237,17 @@ class NichtfachlicheKompetenz(DescribedEntity):
 
 
 class Lehrender(URLEntity):
-    display_fields = ['name', 'titel', 'kontaktdaten', 'fachgebiet', 'lehreinheit', 'editors']
+    display_fields = ['name', 'titel', 'kontaktdaten', 'lehrstuhl', 'editors']
 
     name = models.CharField(max_length=200,
                             help_text="Vor- und Nachname")
     titel = models.CharField(max_length=100,
                              blank=True,
                              help_text="Akademischer Titel")
-    fachgebiet = models.ForeignKey('Fachgebiet',
-                                   help_text=u"Welchem Fachgebiet gehört Lehrende(r) an?")
-    lehreinheit = models.ForeignKey('Lehreinheit',
-                                    help_text=u"Welcher Lehreinheit (typisch: Institut) gehört Lehrende(r) an?")
+    lehrstuhl = models.ForeignKey('Lehrstuhl',
+                                   help_text=u"Welchem Lehrstuhl gehört Lehrende(r) an?")
+    # lehreinheit = models.ForeignKey('Lehreinheit',
+    #                                 help_text=u"Welcher Lehreinheit (typisch: Institut) gehört Lehrende(r) an?")
 
     class Meta:
         verbose_name_plural = "Lehrende"
@@ -312,7 +313,7 @@ class Lehrveranstaltung(SWSEntity):
     # inhaltEn = models.TextField(blank=True,
     #                             verbose_name="Inhalt (engl.)",
     # )
-    lernergebnisDe = models.TextField(#blank=True,
+    lernergebnisDe = models.TextField(blank=True,
                                       verbose_name="Lernergebnis und Kompetenzen",
                                       help_text=
                                       "Kompetenzorientierte Beschreibung")
@@ -365,10 +366,11 @@ class Lehrveranstaltung(SWSEntity):
                                        help_text="Courses that can be taken afterward")
 
     lehrform = models.CharField(max_length=200,
-                                  verbose_name="Lehrform")
+                                verbose_name="Lehrform")
 
-    gruppengrosse = models.IntegerField(blank=False,
-                                        verbose_name="Gruppengröße (TN)")
+    gruppengrosse = models.CharField(blank=False,
+                                     max_length= 50,
+                                     verbose_name="Gruppengröße (TN)")
 
     # status = models.CharField(blank=True,
     #                           max_length=10,
@@ -642,10 +644,10 @@ class Modul(DescribedEntity):
 
 
 class Prufungsleistung(OwnedEntity):
-    prufungsform = models.CharField(blank=True,
+    prufungsform = models.CharField(#blank=True,
                                     max_length=60,
                                     verbose_name=u'Prüfungsform')
-    dauer = models.CharField(blank=True,
+    dauer = models.CharField(#blank=True,
                              max_length=60,
                              verbose_name="Dauer bzw Umfang")
     gewichtung = models.IntegerField(default=50,
@@ -674,25 +676,24 @@ class Prufungsleistung(OwnedEntity):
 
 class VeranstaltungsLps(DescribedEntity):
 
-    lp = models.IntegerField(default=0,
-                             verbose_name="Leistungspunkte",
+    lp = models.IntegerField(verbose_name="Leistungspunkte",
                              help_text=
                              u"Anzahl LPs für diese Lehrveranstaltung in diesem Modul")
     veranstaltung = models.ForeignKey(Lehrveranstaltung)
     modul = models.ForeignKey(Modul)
     prufungsleistung = models.ForeignKey(Prufungsleistung,
                                          verbose_name=u"Prüfungsleistung")
+    sl_qt = models.CharField(max_length=10,
+                             verbose_name='SL / QT',
+                             choices=(('SL', 'SL'),
+                                      ('QT', 'QT'))
+                             )
     form = models.CharField(blank=True,
                             max_length=40,
                             verbose_name='Form')
     dauer_umfang = models.CharField(blank=True,
                              max_length=25,
                              verbose_name='Dauer bzw Umfang')
-    sl_qt = models.CharField(max_length=10,
-                             verbose_name='SL / QT',
-                             choices=(('SL', 'SL'),
-                                      ('QT', 'QT'))
-                             )
     # studienleistung = models.ForeignKey(Studienleistung, verbose_name="Form / Dauer u. Umfang / Studienleistung")
     status = models.CharField(max_length=5,
                               choices=(('P', 'P'),
@@ -729,12 +730,12 @@ class VeranstaltungsLps(DescribedEntity):
 #         ordering = ["nameDe", ]
 
 
-class Studiengang(ResponsibleEntity):
+class Studiengang(DescribedEntity):
 
     display_fields = [
         'nameDe', 'nameEn',
         'kontaktdaten',
-        'verantwortlicher',
+        # 'verantwortlicher', not inherited from ResponsibleEntity anymore
         'module',
         # 'focusareas',
         'startdateien',
@@ -757,7 +758,7 @@ class Studiengang(ResponsibleEntity):
 
 class Moduletype(models.Model):
     type_of_module = models.CharField(max_length=100)
-    relevant_studiengang = models.ForeignKey('Studiengang')
+    # relevant_studiengang = models.ForeignKey('Studiengang')
     class Meta:
         verbose_name = "Module Type"
         verbose_name_plural = "Module Types"

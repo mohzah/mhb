@@ -81,19 +81,19 @@ urlpatterns = [
     # else, autmatically going back to the right URLs in change_form
     # does not work
 
-    url(r'/fachgebiet$',
-        active_and_login_required(views.FachgebieteView.as_view()),
-        name="fachgebietList"),
-    url(r'/fachgebiet/(?P<pk>[0-9]+)$',
-        active_and_login_required(views.FachgebieteDetailView.as_view()),
-        name="fachgebietDetail"),
+    url(r'/lehrstuhl$',
+        active_and_login_required(views.LehrstuhlView.as_view()),
+        name="lehrstuhlList"),
+    url(r'/lehrstuhl/(?P<pk>[0-9]+)$',
+        active_and_login_required(views.LehrstuhlDetailView.as_view()),
+        name="lehrstuhlDetail"),
 
-    url(r'/lehreinheit$',
-        active_and_login_required(views.LehreinheitenView.as_view()),
-        name="lehreinheitList"),
-    url(r'/lehreinheit/(?P<pk>[0-9]+)$',
-        active_and_login_required(views.LehreinheitenDetailView.as_view()),
-        name="lehreinheitDetail"),
+    # url(r'/lehreinheit$',
+    #     active_and_login_required(views.LehreinheitenView.as_view()),
+    #     name="lehreinheitList"),
+    # url(r'/lehreinheit/(?P<pk>[0-9]+)$',
+    #     active_and_login_required(views.LehreinheitenDetailView.as_view()),
+    #     name="lehreinheitDetail"),
 
     url(r'/lehrender$',
         active_and_login_required(views.LehrendeView.as_view()),

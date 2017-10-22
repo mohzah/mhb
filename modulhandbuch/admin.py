@@ -322,14 +322,14 @@ class LehrenderAdmin(OwnedAdmin):
 
 
 
-class FachgebietAdmin(OwnedAdmin):
-    model = Fachgebiet
-    form = select2_modelform(Fachgebiet, attrs={'width': '250px'})
+class LehrstuhlAdmin(OwnedAdmin):
+    model = Lehrstuhl
+    form = select2_modelform(Lehrstuhl, attrs={'width': '250px'})
 
 
-class LehreinheitAdmin(OwnedAdmin):
-    model = Lehreinheit
-    form = select2_modelform(Lehreinheit, attrs={'width': '250px'})
+# class LehreinheitAdmin(OwnedAdmin):
+#     model = Lehreinheit
+#     form = select2_modelform(Lehreinheit, attrs={'width': '250px'})
 
 
 class PruefungsformAdmin(OwnedAdmin):
@@ -369,8 +369,8 @@ class LehrveranstaltungAdmin(OwnedAdmin):
 
 ####################
 
-admin.site.register(Lehreinheit, LehreinheitAdmin)
-admin.site.register(Fachgebiet, FachgebietAdmin)
+# admin.site.register(Lehreinheit, LehreinheitAdmin)
+admin.site.register(Lehrstuhl, LehrstuhlAdmin)
 admin.site.register(Lehrender, LehrenderAdmin)
 admin.site.register(Pruefungsform, PruefungsformAdmin)
 admin.site.register(Organisationsform, OrganisationsformAdmin)

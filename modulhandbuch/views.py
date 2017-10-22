@@ -71,12 +71,12 @@ class SimpleListView(ListView):
         return context
 
 
-class FachgebieteView(SimpleListView):
-    model = models.Fachgebiet
+class LehrstuhlView(SimpleListView):
+    model = models.Lehrstuhl
 
 
-class LehreinheitenView(SimpleListView):
-    model = models.Lehreinheit
+# class LehreinheitenView(SimpleListView):
+#     model = models.Lehreinheit
 
 
 class LehrendeView(SimpleListView):
@@ -199,12 +199,12 @@ class SimpleDetailView(DetailView):
         return context
 
 
-class FachgebieteDetailView(SimpleDetailView):
-    model = models.Fachgebiet
+class LehrstuhlDetailView(SimpleDetailView):
+    model = models.Lehrstuhl
 
 
-class LehreinheitenDetailView(SimpleDetailView):
-    model = models.Lehreinheit
+# class LehreinheitenDetailView(SimpleDetailView):
+#     model = models.Lehreinheit
 
 
 class LehrendeDetailView(SimpleDetailView):
@@ -399,8 +399,8 @@ class Generieren(TemplateView):
         # Databae retrieval:
         # pass in all the generic data, not related to
         # the concrete studiengang
-        _lehreinheiten = models.Lehreinheit.objects.all()
-        _fachgebiete = models.Fachgebiet.objects.all()
+        # _lehreinheiten = models.Lehreinheit.objects.all()
+        _lehrstuhl = models.Lehrstuhl.objects.all()
         _lehrende = models.Lehrender.objects.all()
         _studiengaenge = models.Studiengang.objects.all()
 
@@ -455,8 +455,8 @@ class Generieren(TemplateView):
                 #                        models.lehrveranstaltungen.objects.all()]
 
                 r = ltemplate.render(
-                    lehreinheiten=_lehreinheiten,
-                    fachgebiete=_fachgebiete,
+                    # lehreinheiten=_lehreinheiten,
+                    lehrstuhl=_lehrstuhl,
                     pruefungsformen=_pruefungsformen,
                     organisationsformen=_organisationsformen,
                     lehrende=_lehrende,
