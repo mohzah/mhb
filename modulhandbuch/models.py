@@ -675,7 +675,6 @@ class Prufungsleistung(OwnedEntity):
 
 
 class VeranstaltungsLps(DescribedEntity):
-
     lp = models.IntegerField(verbose_name="Leistungspunkte",
                              help_text=
                              u"Anzahl LPs für diese Lehrveranstaltung in diesem Modul")
@@ -683,7 +682,8 @@ class VeranstaltungsLps(DescribedEntity):
     modul = models.ForeignKey(Modul)
     prufungsleistung = models.ForeignKey(Prufungsleistung,
                                          verbose_name=u"Prüfungsleistung")
-    sl_qt = models.CharField(max_length=10,
+    sl_qt = models.CharField(blank=True,
+                             max_length=10,
                              verbose_name='SL / QT',
                              choices=(('SL', 'SL'),
                                       ('QT', 'QT'))
@@ -699,7 +699,6 @@ class VeranstaltungsLps(DescribedEntity):
                               choices=(('P', 'P'),
                                        ('PW', 'WP')),
                               help_text='Status (P/WP)')
-
 
     class Meta:
         verbose_name = "LP pro Veranstaltung"
