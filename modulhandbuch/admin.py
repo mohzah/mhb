@@ -228,7 +228,7 @@ class ModulLVInline(OwnedInline):
     # form = select2_modelform(FocusArea, attrs={'width': '250px'})
     fk_name = "modul"
     # fields = ['veranstaltung', 'lp', 'prufungsleistung', 'studienleistung', 'status']
-    fields = ['veranstaltung', 'lp', 'prufungsleistung', 'sl_qt', 'status', 'form', 'dauer_umfang']
+    fields = ['veranstaltung', 'lp', 'sl_qt', 'prufungsleistung', 'status', 'form', 'dauer_umfang']
     readonly_fields = ['modul']
     verbose_name = "Lehrveranstaltung (und LP) in diesem Modul"
     verbose_name_plural = "Lehrveranstaltungen (und LPs) in diesem Modul"
